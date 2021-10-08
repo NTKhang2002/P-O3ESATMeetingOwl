@@ -16,3 +16,15 @@ if __name__ == '__main__':
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 print("Joren is the best")
 print("No, Thomas is king")
+
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        x=1
+        while x<=n:
+            return n*factorial(n-1)
+
+print(factorial(3))
+print(factorial(15))
+print(factorial(130))
