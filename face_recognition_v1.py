@@ -26,4 +26,3 @@ while True:
         break
 # Release the VideoCapture object
 cap.release()
-
