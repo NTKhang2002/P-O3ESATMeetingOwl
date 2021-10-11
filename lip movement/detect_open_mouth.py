@@ -13,8 +13,6 @@ import imutils
 import time
 import dlib
 import cv2
-
-
 def mouth_aspect_ratio(mouth):
     # compute the euclidean distances between the two sets of
     # vertical mouth landmarks (x, y)-coordinates
