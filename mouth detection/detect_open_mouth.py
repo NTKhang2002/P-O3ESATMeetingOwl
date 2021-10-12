@@ -81,7 +81,6 @@ while True:
 
     # loop over the face detections
     for rect in rects:
-        print(rect)
         # determine the facial landmarks for the face region, then
         # convert the facial landmark (x, y)-coordinates to a NumPy
         # array
