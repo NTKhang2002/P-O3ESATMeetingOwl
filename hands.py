@@ -4,12 +4,12 @@ mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 
-
 # For webcam input:
 cap = cv2.VideoCapture(0)
 with mp_hands.Hands(
     min_detection_confidence=0.5,
-    min_tracking_confidence=0.5) as hands:
+    min_tracking_confidence=0.5,
+    max_num_hands=12) as hands:
   while cap.isOpened():
     success, image = cap.read()
     if not success:
