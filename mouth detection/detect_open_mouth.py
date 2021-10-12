@@ -81,6 +81,7 @@ while True:
 
     # loop over the face detections
     for rect in rects:
+        print(rect)
         # determine the facial landmarks for the face region, then
         # convert the facial landmark (x, y)-coordinates to a NumPy
         # array
@@ -96,7 +97,7 @@ while True:
         # compute the convex hull for the mouth, then
         # visualize the mouth
         mouthHull = cv2.convexHull(mouth)
-
+        (x, y, w, h) = face_utils.rect_to_bb(rect)
         cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         # Draw text if mouth is open + visualize the mouth in blue
@@ -109,6 +110,7 @@ while True:
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             color = GREEN
         # Visualize the mouth in green
+        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
     # Write the frame into the file 'output.avi'
     out.write(frame)
