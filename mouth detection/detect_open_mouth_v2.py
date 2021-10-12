@@ -13,6 +13,12 @@ import imutils
 import time
 import dlib
 import cv2
+
+delay = 2
+counter = time.time() - delay
+BLUE = (255, 0, 0)
+GREEN = (0, 255, 0)
+
 def mouth_aspect_ratio(mouth):
     # compute the euclidean distances between the two sets of
     # vertical mouth landmarks (x, y)-coordinates
@@ -39,7 +45,7 @@ ap.add_argument("-w", "--webcam", type=int, default=0,
 args = vars(ap.parse_args())
 
 # define one constants, for mouth aspect ratio to indicate open mouth
-MOUTH_AR_THRESH = 0.75
+MOUTH_AR_THRESH = 0.70
 
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
@@ -93,13 +99,20 @@ while True:
         # visualize the mouth
         mouthHull = cv2.convexHull(mouth)
 
-        cv2.drawContours(frame, [mouthHull], -1, (0, 255, 0), 1)
         cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-        # Draw text if mouth is open
+        # Draw text if mouth is open + visualize the mouth in blue
         if mar > MOUTH_AR_THRESH:
-            cv2.putText(frame, "Mouth is Open!", (30, 60),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(frame, "MOUTH OPEN", (30, 60),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+            color = BLUE
+            counter = time.time()
+        elif time.time() - counter >= delay:
+            cv2.putText(frame, "MOUTH CLOSED", (30, 60),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+            color = GREEN
+        # Visualize the mouth in green
+        cv2.drawContours(frame, [mouthHull], -1, color, 1)
     # Write the frame into the file 'output.avi'
     out.write(frame)
     # show the frame

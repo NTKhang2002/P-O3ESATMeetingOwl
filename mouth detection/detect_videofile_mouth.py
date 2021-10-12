@@ -14,6 +14,10 @@ import time
 import dlib
 import cv2
 
+counter = time.time() - 2
+BLUE = (255, 0, 0)
+GREEN = (0, 255, 0)
+
 def mouth_aspect_ratio(mouth):
 	# compute the euclidean distances between the two sets of
 	# vertical mouth landmarks (x, y)-coordinates
@@ -95,12 +99,14 @@ while True:
 			cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 		# Draw text if mouth is open + visualize the mouth in blue
 		if mar > MOUTH_AR_THRESH:
-			cv2.drawContours(frame, [mouthHull], -1, (255, 0, 0), 1)
 			cv2.putText(frame, "Mouth is Open!", (30,60),
 			cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255),2)
+			color = BLUE
+			counter = time.time()
+		elif time.time() - counter >= 2:
+			color = GREEN
 		# Visualize the mouth in green
-		else:
-			cv2.drawContours(frame, [mouthHull], -1, (0, 255, 0), 1)
+		cv2.drawContours(frame, [mouthHull], -1, color, 1)
 	# Write the frame into the file 'output.avi'
 	out.write(frame)
 	# show the frame
