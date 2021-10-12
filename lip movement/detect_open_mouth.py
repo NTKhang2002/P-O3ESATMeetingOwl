@@ -41,7 +41,7 @@ ap.add_argument("-w", "--webcam", type=int, default=0,
 args = vars(ap.parse_args())
 
 # define one constants, for mouth aspect ratio to indicate open mouth
-MOUTH_AR_THRESH = 0.79
+MOUTH_AR_THRESH = 0.75
 
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
