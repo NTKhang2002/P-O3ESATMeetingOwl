@@ -75,7 +75,6 @@ while True:
     frame = vs.read()
     frame = imutils.resize(frame, width=640)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
     # detect faces in the grayscale frame
     rects = detector(gray, 0)
 
@@ -95,6 +94,7 @@ while True:
         mar = mouthMAR
         # compute the convex hull for the mouth, then
         # visualize the mouth
+
         mouthHull = cv2.convexHull(mouth)
         (x, y, w, h) = face_utils.rect_to_bb(rect)
         cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
