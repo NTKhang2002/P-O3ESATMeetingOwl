@@ -17,7 +17,18 @@ import cv2
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
 
-talking_setup = False
+import time
+
+status_mond = False     #last state of the mouth, open or closed -MN
+talking = False     #Talking state -MN
+open_teller = 0     #counts how many times the mouth has opened during the video, unimportant -MN
+
+teller_timing = 0   #Counter for 'timing_open' -MN
+timing_open = [0, 0, 0, 0, 0]   #List to log the 4 last times the mouth has opened -MN
+
+timing_toe_begin = 0    #Timelog when mouth went from open to closed -MN
+timing_toe_eind = 0     #Time when mouth is shut -MN
+
 
 
 
@@ -107,15 +118,70 @@ while True:
 
         # Draw text if mouth is open + visualize the mouth in blue
         if mar > MOUTH_AR_THRESH:
+
+            if status_mond == False:
+                status_mond = True
+
+                if teller_timing == 4:
+
+                    teller_timing = 0
+                teller_timing += 1
+                timing_open[teller_timing] = time.time()
+
+                open_teller += 1
+
+
+
+
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+
+            cv2.putText(frame, "teller: " + str(open_teller), (30, 120),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+
+            cv2.putText(frame, "timing: " + str(timing_open[teller_timing]), (30, 180),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+
+            cv2.putText(frame, "Talking: " + str(talking), (30, 240),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+
             color = BLUE
-            if talking_setup == False:
+
 
         else:
-            cv2.putText(frame, "MOUTH CLOSED", (30, 60),
+
+            timing_toe_eind = time.time()
+
+            if status_mond == True:
+                status_mond = False
+                timing_toe_begin = time.time()
+
+            cv2.putText(frame, "MOUTH CLOSED ", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+            cv2.putText(frame,"Toe_1: " + str(timing_toe_begin),
+                        (30, 120),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+            cv2.putText(frame," Toe_2: " + str(timing_toe_eind),
+                        (30, 180),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+            cv2.putText(frame, "Talking: " + str(talking), (30, 240),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+
             color = GREEN
+
+        toe_periode = timing_toe_eind - timing_toe_begin
+
+
+        if (timing_open[teller_timing] - timing_open[teller_timing - 4]) < 2 : #Mouth has to open 4 times in less than 2 seconds to get 'talking' state -MN
+            talking = True
+
+        if toe_periode > 2:     #if mouth has been closed for longer than 2 seconds, 'talking' state will go to False -MN
+            talking = False
+
+
         # Visualize the mouth in green
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
     # Write the frame into the file 'output.avi'
