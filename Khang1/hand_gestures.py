@@ -14,7 +14,8 @@ import mediapipe as mp
 from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
-
+import sys, os
+sys.path.append('/path/to/Khang1')
 
 def get_args():
     parser = argparse.ArgumentParser()
