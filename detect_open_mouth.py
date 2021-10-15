@@ -112,7 +112,7 @@ while True:
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
     # Write the frame into the file 'output.avi'
-    out.write(frame)
+    # out.write(frame)
     # show the frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
