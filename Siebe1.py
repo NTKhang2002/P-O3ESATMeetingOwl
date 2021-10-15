@@ -17,7 +17,7 @@ import cv2
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
 
-talking_setup = False
+
 
 
 
@@ -110,7 +110,7 @@ while True:
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
             color = BLUE
-            if talking_setup == False:
+
 
         else:
             cv2.putText(frame, "MOUTH CLOSED", (30, 60),
