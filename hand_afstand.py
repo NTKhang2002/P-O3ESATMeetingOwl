@@ -1,6 +1,4 @@
 import cv2
-
-
 from cvzone.HandTrackingModule import HandDetector
 #1)
 cap = cv2.VideoCapture(0)
@@ -32,7 +30,8 @@ while True:
             length, info, img = detector.findDistance(lmList1[8], lmList2[8], img)
 
     cv2.imshow("image", img)
-    cv2.waitKey(1)
+    if cv2.waitKey(1) == ord('q'):
+        break
 
 
 
