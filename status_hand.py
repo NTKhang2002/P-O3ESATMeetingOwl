@@ -38,6 +38,5 @@ def main(detectionCon = 0.8, maxHands = 4):
         if cv2.waitKey(1) == ord('q'):
             break
 
-
 if __name__ == '__main__':
     main()
