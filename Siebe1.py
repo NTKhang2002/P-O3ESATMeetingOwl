@@ -16,7 +16,14 @@ import cv2
 
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
+<<<<<<< HEAD
 people = []
+=======
+
+
+
+
+>>>>>>> c26c22646655ac58d9d8ebdfdbd3489d3f76c1d5
 
 def mouth_aspect_ratio(mouth):
     # compute the euclidean distances between the two sets of
@@ -103,6 +110,11 @@ while True:
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
             color = BLUE
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> c26c22646655ac58d9d8ebdfdbd3489d3f76c1d5
         else:
             cv2.putText(frame, "MOUTH CLOSED", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
