@@ -17,10 +17,13 @@ def zoom(img,faces, face=0):
         W = faces[face][2]
         H = faces[face][3]
 
-        ymin = max(min(int(((Y-3*H/2)/(3*H))*img.shape[0]),img.shape[0]),0)
-        ymax = min(max(int(((Y+3*H/2)/(3*H))*img.shape[0]),0),img.shape[0])
-        xmin = max(min(int(((X-3*W/2)/(3*W))*img.shape[1]),img.shape[1]),0)
-        xmax = min(max(int(((X+3*W/2)/(3*W))*img.shape[1]),0),img.shape[1])
+        Ry = img.shape[0]
+        Rx = img.shape[1]
+
+        ymin = max(min(int(((Y-3*H/2)/(3*H))*Ry),Ry),0)
+        ymax = min(max(int(((Y+3*H/2)/(3*H))*Ry),0),Ry)
+        xmin = max(min(int(((X-3*W/2)/(3*W))*Rx),Rx),0)
+        xmax = min(max(int(((X+3*W/2)/(3*W))*Rx),0),Rx)
         print('data',[ymin, ymax, xmin,xmax])
         imgzoom = img[ymin:ymax,xmin:xmax]
         imgresized = cv2.resize(imgzoom,(img.shape[1],img.shape[0]))
