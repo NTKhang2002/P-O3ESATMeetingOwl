@@ -14,10 +14,15 @@ def zoom(img,faces, face=0):
     if not faces == ():
         X = faces[face][0]
         Y = faces[face][1]
-        W = 209 #faces[face][2]
-        H = 209 #faces[face][3]
-        imgzoom = img[max(Y - int(3*(H)/2),0):min(Y + int(3*H/2),img.shape[0]),
-                  max(X - int(3*W/2),0):min(X + int(3*W/2),img.shape[1])]
+        W = faces[face][2]
+        H = faces[face][3]
+
+        ymin = max(min(int(((Y-3*H/2)/(3*H))*img.shape[0]),img.shape[0]),0)
+        ymax = min(max(int(((Y+3*H/2)/(3*H))*img.shape[0]),0),img.shape[0])
+        xmin = max(min(int(((X-3*W/2)/(3*W))*img.shape[1]),img.shape[1]),0)
+        xmax = min(max(int(((X+3*W/2)/(3*W))*img.shape[1]),0),img.shape[1])
+        print('data',[ymin, ymax, xmin,xmax])
+        imgzoom = img[ymin:ymax,xmin:xmax]
         imgresized = cv2.resize(imgzoom,(img.shape[1],img.shape[0]))
         return imgresized
     else:
