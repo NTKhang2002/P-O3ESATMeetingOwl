@@ -17,11 +17,12 @@ import cv2
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
 
-persoon_1 = [0, 0]
-persoon_2 = [0, 0]
-persoon_3 = [0, 0]
+persoon_1 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_1'}
+persoon_2 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_2'}
+persoon_3 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_3'}
+persoon_4 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_4'}
 
-
+persoon_teller = 0
 
 
 def mouth_aspect_ratio(mouth):
@@ -87,6 +88,8 @@ while True:
 
     # loop over the face detections
     for rect in rects:
+
+        persoon_teller += 1
         # determine the facial landmarks for the face region, then
         # convert the facial landmark (x, y)-coordinates to a NumPy
         # array
@@ -108,6 +111,9 @@ while True:
 
 
 
+
+
+
         # Draw text if mouth is open + visualize the mouth in blue
         if mar > MOUTH_AR_THRESH:
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
@@ -120,13 +126,53 @@ while True:
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             color = GREEN
         # Visualize the mouth in green
-        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)      #Square over face
+
+
+
+        if persoon_1['present'] == False:
+            persoon_1['present'] = True
+            persoon_1['position'] = [ x , y ]
+
+        elif (x -50) < persoon_1['position'][0] < (x + 50):
+            persoon_1['position'] = [x, y]
+
+        elif persoon_2['present'] == False:
+            persoon_2['present'] = True
+            persoon_2['position'] = [x, y]
+
+        elif (x - 50) < persoon_2['position'][0] < (x + 50):
+            persoon_2['position'] = [x, y]
+
+
+
+
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
     # Write the frame into the file 'output.avi'
     out.write(frame)
     # show the frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
+
+    persoon_teller = 0
+
+    if persoon_1['present'] == True:
+        cv2.putText(frame, 'persoon_1', (persoon_1['position'][0], persoon_1['position'][1]),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+        color = GREEN
+
+        print('persoon1: '+ str(persoon_1['position']))
+
+
+    if persoon_2['present'] == True:
+        cv2.putText(frame, 'persoon_2', (persoon_2['position'][0], persoon_2['position'][1]),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+        color = GREEN
+
+        print('persoon2: ' + str(persoon_2['position']))
+
 
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
