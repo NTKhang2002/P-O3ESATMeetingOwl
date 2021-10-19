@@ -33,46 +33,12 @@ def mouth_aspect_ratio(mouth):
     # return the mouth aspect ratio
     return mar
 
-
-# construct the argument parse and parse the arguments
-ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--shape-predictor", required=False, default='shape_predictor_68_face_landmarks.dat',
-                help="path to facial landmark predictor")
-ap.add_argument("-w", "--webcam", type=int, default=0,
-                help="index of webcam on system")
-args = vars(ap.parse_args())
-
-# define one constants, for mouth aspect ratio to indicate open mouth
-MOUTH_AR_THRESH = 0.70
-
-# initialize dlib's face detector (HOG-based) and then create
-# the facial landmark predictor
-print("[INFO] loading facial landmark predictor...")
-detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(args["shape_predictor"])
-
-# grab the indexes of the facial landmarks for the mouth
-(mStart, mEnd) = (49, 68)
-
-# start the video stream thread
-print("[INFO] starting video stream thread...")
-vs = VideoStream(src=args["webcam"]).start()
-
-time.sleep(1.0)
-
-frame_width = 640
-frame_height = 360
-
-# Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
-out = cv2.VideoWriter('outpy.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30, (frame_width, frame_height))
-time.sleep(1.0)
-
-# loop over frames from the video stream
-while True:
+def main(frame,detector, predictor, MOUTH_AR_THRESH = 0.70):
+    # grab the indexes of the facial landmarks for the mouth
+    (mStart, mEnd) = (49, 68)
     # grab the frame from the threaded video file stream, resize
     # it, and convert it to grayscale
     # channels)
-    frame = vs.read()
     frame = imutils.resize(frame, width=640)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -114,13 +80,7 @@ while True:
     # Write the frame into the file 'output.avi'
     # out.write(frame)
     # show the frame
-    cv2.imshow("Frame", frame)
-    key = cv2.waitKey(1) & 0xFF
+    return frame
 
-    # if the `q` key was pressed, break from the loop
-    if key == ord("q"):
-        break
-
-# do a bit of cleanup
-cv2.destroyAllWindows()
-vs.stop()
+if __name__ == "__main__":
+    main()
