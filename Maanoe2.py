@@ -14,13 +14,20 @@ import time
 import dlib
 import cv2
 
+
+
+tijd = time.time()
+
+
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
 
-persoon_1 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_1'}
-persoon_2 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_2'}
-persoon_3 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_3'}
-persoon_4 = {'position': [0, 0], 'talking': False , 'present': False , 'naam': 'persoon_4'}
+mond_algemeen = False
+
+persoon_1 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_1', 'tijd': 0, 'mond': False}
+persoon_2 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_2', 'tijd': 0, 'mond': False}
+persoon_3 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_3', 'tijd': 0, 'mond': False}
+persoon_4 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_4', 'tijd': 0, 'mond': False}
 
 persoon_teller = 0
 
@@ -109,22 +116,20 @@ while True:
         (x, y, w, h) = face_utils.rect_to_bb(rect)
         cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-
-
-
-
-
         # Draw text if mouth is open + visualize the mouth in blue
         if mar > MOUTH_AR_THRESH:
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
             color = BLUE
+            mond_algemeen = True
 
 
         else:
             cv2.putText(frame, "MOUTH CLOSED", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             color = GREEN
+            mond_algemeen = False
+
         # Visualize the mouth in green
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)      #Square over face
 
@@ -132,18 +137,41 @@ while True:
 
         if persoon_1['present'] == False:
             persoon_1['present'] = True
-            persoon_1['position'] = [ x , y ]
+            persoon_1['position'] = [x, y]
+            persoon_1['tijd'] = time.time()
+
+            if mond_algemeen:
+                persoon_1['mond'] = True
+            else:
+                persoon_1['mond'] = False
 
         elif (x -50) < persoon_1['position'][0] < (x + 50):
             persoon_1['position'] = [x, y]
+            persoon_1['tijd'] = time.time()
+
+            if mond_algemeen:
+                persoon_1['mond'] = True
+            else:
+                persoon_1['mond'] = False
 
         elif persoon_2['present'] == False:
             persoon_2['present'] = True
             persoon_2['position'] = [x, y]
+            persoon_2['tijd'] = time.time()
+
+            if mond_algemeen:
+                persoon_2['mond'] = True
+            else:
+                persoon_2['mond'] = False
 
         elif (x - 50) < persoon_2['position'][0] < (x + 50):
             persoon_2['position'] = [x, y]
+            persoon_2['tijd'] = time.time()
 
+            if mond_algemeen:
+                persoon_2['mond'] = True
+            else:
+                persoon_2['mond'] = False
 
 
 
@@ -162,7 +190,7 @@ while True:
 
         color = GREEN
 
-        print('persoon1: '+ str(persoon_1['position']))
+
 
 
     if persoon_2['present'] == True:
@@ -171,12 +199,24 @@ while True:
 
         color = GREEN
 
-        print('persoon2: ' + str(persoon_2['position']))
+
 
 
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
         break
+
+    tijd = time.time()
+    if tijd - persoon_1['tijd'] > 5:
+        persoon_1['position'] = [-1000, -1000]
+        persoon_1['present'] = False
+
+    if tijd - persoon_2['tijd'] > 5:
+        persoon_2['position'] = [-1000,-1000]
+        persoon_2['present'] = False
+
+    print('persoon1: ' + str(persoon_1['position']), 'persoon2: ' + str(persoon_2['position']))
+    print(str(tijd - persoon_1['tijd']),str(tijd - persoon_2['tijd']))
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
