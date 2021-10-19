@@ -9,13 +9,14 @@ import argparse
 
 
 class people:
-    def __init__(self,fx,fy,t,hx,hy,hs):
+    def __init__(self,id,fx,fy,t,hx,hy,hs):
         """
         fx, fy: face position
         t: talking status
         hx, hy: hand position
         hs: hand status
         """
+        self.id = id
         self.fx = fx
         self.fy = fy
         self.t = t
@@ -51,12 +52,13 @@ def main(detectionCon = 0.8, maxHands = 4):
     args = argsfunc()
     detector_face = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(args["shape_predictor"])
-    for k in range(100)
-    success, img = cap.read()
-    hands, img = detector.findHands(img)
-    handstatus = sh.hand_status(detector, hands)
+    for k in range(25):
+        success, img = cap.read()
+        hands, img = detector.findHands(img)
+        handstatus = sh.hand_status(detector, hands)
     for i in handstatus:
-        print(i)
+        people(i,None,None,None,[i][])
+    print("Initialization complete")
     sleep(100)
     while True:
         success, img = cap.read()
