@@ -16,10 +16,7 @@ import cv2
 
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
-
-talking_setup = False
-
-
+people = []
 
 def mouth_aspect_ratio(mouth):
     # compute the euclidean distances between the two sets of
@@ -47,7 +44,7 @@ ap.add_argument("-w", "--webcam", type=int, default=0,
 args = vars(ap.parse_args())
 
 # define one constants, for mouth aspect ratio to indicate open mouth
-MOUTH_AR_THRESH = 0.70
+MOUTH_AR_THRESH = 2.5
 
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
@@ -62,14 +59,11 @@ predictor = dlib.shape_predictor(args["shape_predictor"])
 print("[INFO] starting video stream thread...")
 vs = VideoStream(src=args["webcam"]).start()
 
-time.sleep(1.0)
-
 frame_width = 640
 frame_height = 360
 
 # Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
 out = cv2.VideoWriter('outpy.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30, (frame_width, frame_height))
-time.sleep(1.0)
 
 # loop over frames from the video stream
 while True:
@@ -82,6 +76,8 @@ while True:
     # detect faces in the grayscale frame
     rects = detector(gray, 0)
 
+    people = []
+
     # loop over the face detections
     for rect in rects:
         # determine the facial landmarks for the face region, then
@@ -93,7 +89,6 @@ while True:
         # extract the mouth coordinates, then use the
         # coordinates to compute the mouth aspect ratio
         mouth = shape[mStart:mEnd]
-
         mouthMAR = mouth_aspect_ratio(mouth)
         mar = mouthMAR
         # compute the convex hull for the mouth, then
@@ -103,15 +98,11 @@ while True:
         (x, y, w, h) = face_utils.rect_to_bb(rect)
         cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-
-
         # Draw text if mouth is open + visualize the mouth in blue
         if mar > MOUTH_AR_THRESH:
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
             color = BLUE
-            if talking_setup == False:
-
         else:
             cv2.putText(frame, "MOUTH CLOSED", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
@@ -119,8 +110,9 @@ while True:
         # Visualize the mouth in green
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
+        people.append(((shape[34][0],shape[34][1]),mar>MOUTH_AR_THRESH))
     # Write the frame into the file 'output.avi'
-    out.write(frame)
+    #out.write(frame)
     # show the frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
@@ -128,7 +120,7 @@ while True:
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
         break
-
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
+
