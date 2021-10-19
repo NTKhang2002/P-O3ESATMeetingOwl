@@ -6,7 +6,7 @@ def hand_status(detector, hands):
     if hands:
         for id in range(len(hands)):
             hand = hands[id]
-            centerPoint = hand["center"]  # centerpoint: cx cy
+            cx, cy = hand["center"]  # centerpoint: cx cy
             fingers = detector.fingersUp(hand)
             if fingers == [0,0,0,0,0]:
                 """ HAND STATUS: -1 Closed
@@ -18,7 +18,7 @@ def hand_status(detector, hands):
             else:
                 hand_status = 0
 
-            result = (id, hand_status, centerPoint)
+            result = (hand_status, cx, cy)
             yield result
 
 def main(detectionCon = 0.8, maxHands = 4):
