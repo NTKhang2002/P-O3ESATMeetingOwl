@@ -24,6 +24,19 @@ GREEN = (0, 255, 0)
 
 mond_algemeen = False
 
+
+
+class player:
+    def __init__(self, fx, fy):
+        self.fx = fx
+        self.fy = fy
+        self.talking = False
+        self.present = False
+        self.tijd = 0
+        self.mouth = False
+
+
+
 persoon_1 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_1', 'tijd': 0, 'mond': False}
 persoon_2 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_2', 'tijd': 0, 'mond': False}
 persoon_3 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_3', 'tijd': 0, 'mond': False}
