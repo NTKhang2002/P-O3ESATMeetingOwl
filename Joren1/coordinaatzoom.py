@@ -1,7 +1,5 @@
 import cv2
-SCALE_FACTOR = 1.22     # Medium = 1.2,     Close = 1.14
-MIN_NEIGHBORS = 8       # 8
-MINSIZE = (60, 60)    # Medium = (60, 60),    Close = (120, 120)
+
 
 # creating a variable with the classifiers
 CLASSIFIERS = "haarcascade_frontalface_default.xml"
@@ -31,15 +29,9 @@ def zoom(img,faces, face=0):
         ymax = max(min(int(yfc+H),Ry),int(2*H))
         xmin = max(min(int(xfc-V*H)-1,int(Rx-V*2*H)),0)
         xmax = max(min(int(xfc+V*H),Rx),int(V*2*H))
-        # edge solution
-        """if ymin == 0:
-            ymax = 2*H
-        if ymax == Ry:
-            ymin = Ry-2*H
-        if xmin == 0:
-            xmax = 2 * W
-        if ymax == Rx:
-            ymin = Rx - 2 * W"""
+
+
+
         cv2.rectangle(img,(int(xfc),int(yfc)),(int(xfc+5),int(yfc+5)),(255,255,255),2)
         print(faces)
         print('data', ["ymin =",ymin, "ymax=",ymax,"xmin=", xmin,"xmax=", xmax, "xfc=",xfc,"yfc=", yfc])
@@ -48,9 +40,9 @@ def zoom(img,faces, face=0):
 
         imgresized = cv2.resize(imgzoom, (img.shape[1], img.shape[0]))
         cv2.rectangle(img,(int(xmin),int(ymin)),(int(xmax),int(ymax)),(0,255,0),2)
-        return (imgresized, ymin, ymax, xmin, xmax)
+        return imgresized
     else:
-        return (img,-1,-1,-1,-1)
+        return img
 
 while True:
     status, img = cap.read()
@@ -62,7 +54,7 @@ while True:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
 
-    cv2.imshow('beeld',zoom(img,faces,0)[0])
+    cv2.imshow('beeld',zoom(img,faces,0))
     cv2.imshow('origineel',img)
     toets = cv2.waitKey(1)
     if toets == 27:
