@@ -9,7 +9,7 @@ CLASSIFIERS = "haarcascade_frontalface_default.xml"
 # Create cascade
 FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
 # Capture from camera, 0 because webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 
 
@@ -48,8 +48,7 @@ def zoom(img,faces, face=0):
 
         imgresized = cv2.resize(imgzoom, (img.shape[1], img.shape[0]))
         cv2.rectangle(img,(int(xmin),int(ymin)),(int(xmax),int(ymax)),(0,255,0),2)
-        cv2.rectangle(imgresized,(X,Y),(X+W,Y+H),(255,255,255),2)
-        return (imgzoom, ymin, ymax, xmin, xmax)
+        return (imgresized, ymin, ymax, xmin, xmax)
     else:
         return (img,-1,-1,-1,-1)
 
@@ -63,7 +62,7 @@ while True:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
 
-    cv2.imshow('beeld',zoom(img,faces,1)[0])
+    cv2.imshow('beeld',zoom(img,faces,0)[0])
     cv2.imshow('origineel',img)
     toets = cv2.waitKey(1)
     if toets == 27:
