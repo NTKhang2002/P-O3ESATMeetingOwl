@@ -6,11 +6,11 @@ import face_test
 import detect_open_mouth_test
 import dlib
 import argparse
-
+import lip_detector
 
 class people:
     id = 0
-    def __init__(self,id,fx,fy,t,hx,hy,hs):
+    def __init__(self,fx,fy,t,hx,hy,hs):
         """
         fx, fy: face position
         t: talking status
@@ -32,9 +32,9 @@ class people:
         self.hx = hx
         self.hy = hy
         self.hs = hs
-    def x_position_face(self):
+    def show_fx(self):
         return self.fx
-    def x_position_hand(self):
+    def show_hx(self):
         return self.hx
     def show_data(self):
         return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs
@@ -77,11 +77,11 @@ def main(detectionCon = 0.8, maxHands = 4):
         for person in handstatus:
             hx = person[1]
             for old_person in persons:
-                old_hx = old_person.x_position_hand()
+                old_hx = old_person.show_hx()
                 if abs(hx - old_hx) < 100:
                     old_person.add_data(None,None,None,person[1], person[2],person[0])
-        print(persons[0].show_data())
-        img = detect_open_mouth_test.main(img,detector_face,predictor)
+        #print(persons[0].show_data())
+        img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
