@@ -14,6 +14,7 @@ import time
 import dlib
 import cv2
 
+webcam = 0
 
 participant_counter = 0
 
@@ -154,7 +155,7 @@ def mouth_aspect_ratio(mouth):
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--shape-predictor", required=False, default='shape_predictor_68_face_landmarks.dat',
                 help="path to facial landmark predictor")
-ap.add_argument("-w", "--webcam", type=int, default=1,
+ap.add_argument("-w", "--webcam", type=int, default=webcam,
                 help="index of webcam on system")
 args = vars(ap.parse_args())
 
@@ -189,7 +190,7 @@ while True:
     # it, and convert it to grayscale
     # channels)
     frame = vs.read()
-    frame = imutils.resize(frame, width=640)
+    #frame = imutils.resize(frame, width=640)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # detect faces in the grayscale frame
     rects = detector(gray, 0)
