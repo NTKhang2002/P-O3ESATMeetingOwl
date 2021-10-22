@@ -1,5 +1,7 @@
 import cv2
 
+HEIGHT = 720
+WIDTH = 16/9 * HEIGHT
 
 # creating a variable with the classifiers
 CLASSIFIERS = "haarcascade_frontalface_default.xml"
@@ -8,7 +10,9 @@ CLASSIFIERS = "haarcascade_frontalface_default.xml"
 FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
 # Capture from camera, 0 because webcam
 cap = cv2.VideoCapture(1)
-
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
 
 
 def zoom(img,faces, face=0):
