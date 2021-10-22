@@ -59,9 +59,10 @@ while True:
 
     # Display filtered image as an OpenCV window
     frame.show()
-
+    cv2.imshow("beeld",img)
     # Stop if escape key is pressed
     k = cv2.waitKey(30)
+
     if k == 27:
         break
     if k == 49:

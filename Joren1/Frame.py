@@ -77,12 +77,12 @@ class Frame:
 
         # Make screen to box ratio constant
         # (constant can be changed as ZOOM in main.py)
-        if screenWidth > screenHeight:
+        """if screenWidth > screenHeight:
             distX = min(0.5 * ((boxW / self.zoom) - boxW), distX)
             distY = min(((1.0 / screenRatio) * (distX + (boxW / 2.0))) - (boxH / 2.0), distY)
         else:
             distY = min(0.5 * ((boxH / self.zoom) - boxH), distY)
-            distX = min((screenRatio * (distY + (boxH / 2.0))) - (boxW / 2.0), distX)
+            distX = min((screenRatio * (distY + (boxH / 2.0))) - (boxW / 2.0), distX)"""
 
         # Crop image to match distance values
         newX = int(boxX - distX)

@@ -35,11 +35,14 @@ while True:
     # Detect the faces
     faces = FaceCascade.detectMultiScale(gray, 1.1, 4)
     for (x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        pt2x = int(x+w+5)
+        pt2y = int(y+h+5)
+        cv2.rectangle(img, (x+w, y+h), (pt2x, pt2y), (255, 0, 0), 2)
+        cv2.rectangle(img, (x , y), (x+w, y+h), (0, 0, 255), 2)
     print(faces)
-    cv2.imshow('beeld',zoom(img,faces,0))
-
-    toets = cv2.waitKey(1)
+    cv2.imshow('zoom',zoom(img,faces,0))
+    cv2.imshow('beeld',img)
+    toets = cv2.waitKey(20)
     if toets == 27:
         break
 cap.release()
