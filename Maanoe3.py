@@ -15,8 +15,11 @@ import dlib
 import cv2
 
 
+participant_counter = 0
 
-tijd = time.time()
+marge_x = 50
+
+tijd_algemeen = time.time()
 
 
 BLUE = (255, 0, 0)
@@ -35,13 +38,97 @@ class player:
         self.present = False
         self.tijd = 0
         self.mouth = False
+        self.closed_1 = 0
+        self.closed_2 = 1
+        self.teller_open = 0
+        self.open = [10, 0, 0, 0, 0]
 
+
+participant_1 = player(-1000,-1000)
+participant_1.name = "participant 1"
+participant_2 = player(-1000,-1000)
+participant_2.name = "participant 2"
+participant_3 = player(-1000,-1000)
+participant_3.name = "participant 3"
+participant_4 = player(-1000,-1000)
+participant_4.name = "participant 4"
+
+participant_list = [participant_1, participant_2, participant_3, participant_4]
+
+
+def update(participant, x, y):
+    participant.fx = x
+    participant.fy = y
+    participant.tijd = time.time()
+    print(participant.name + ": " + str(x),str(y))
+    participant.present = True
+
+    if mond_algemeen:
+        if not participant.mouth:
+            participant.mouth = True
+            if participant.teller_open == 4:
+                participant.teller_open = 0
+            participant.teller_open += 1
+            participant.open[participant.teller_open] = time.time()
+
+    else:
+        participant.closed_2 = time.time()
+
+        if participant.mouth:
+            participant.mouth = False
+            participant.closed_1 = time.time()
+
+    if (participant.closed_2 - participant.closed_1) > 3:
+        participant.talking = False
+
+    elif (participant.open[participant.teller_open] - participant.open[participant.teller_open - 4]) < 2:
+        participant.talking = True
+        print(participant.name, ": TALKING")
+
+
+def localiser(participant, x):
+    if (participant.fx - marge_x) <= x <= (participant.fx + marge_x):
+        return True
+    else:
+        return False
+
+
+def check(participant):
+    if participant.present:
+
+        if(tijd_algemeen - participant.tijd) > 5:
+            participant.present = False
+            participant.fx = -1000
+            participant.fy = -1000
 
 
 def assign(x, y):
+    if not participant_1.present:
+        update(participant_1, x, y)
+
+    elif localiser(participant_1, x):
+        update(participant_1, x, y)
+
+    elif not participant_2.present:
+        update(participant_2, x, y)
+
+    elif localiser(participant_2, x):
+        update(participant_2, x, y)
+
+    elif not participant_3.present:
+        update(participant_3, x, y)
+
+    elif localiser(participant_3, x):
+        update(participant_3, x, y)
+
+    elif not participant_4.present:
+        update(participant_4, x, y)
+
+    elif localiser(participant_4, x):
+        update(participant_4, x, y)
 
 
-    break
+
 
 
 
@@ -67,7 +154,7 @@ def mouth_aspect_ratio(mouth):
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--shape-predictor", required=False, default='shape_predictor_68_face_landmarks.dat',
                 help="path to facial landmark predictor")
-ap.add_argument("-w", "--webcam", type=int, default=0,
+ap.add_argument("-w", "--webcam", type=int, default=1,
                 help="index of webcam on system")
 args = vars(ap.parse_args())
 
@@ -147,7 +234,7 @@ while True:
         # Visualize the mouth in green
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)      #Square over face
 
-
+        assign(x, y)
 
 
 
@@ -158,8 +245,10 @@ while True:
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 
-    persoon_teller = 0
+    tijd_algemeen = time.time()
 
+    for k in participant_list:
+        check(k)
 
 
 
