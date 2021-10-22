@@ -1,19 +1,20 @@
 import cv2
 
-HIGH_VALUE = 10000
-WIDTH = HIGH_VALUE
-HEIGHT = HIGH_VALUE
+WIDTH = 800
+HEIGHT = 450
 # creating a variable with the classifiers
 CLASSIFIERS = "haarcascade_frontalface_default.xml"
 
 # Create cascade
 FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
 # Capture from camera, 0 because webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-
+width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+print(width, height)
 def zoom(img,faces, face=0):
     if not faces == () and len(faces) >= face + 1:
         X = faces[face][0]
