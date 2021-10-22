@@ -31,7 +31,6 @@ def zoom(img,faces, face=0):
         xmax = max(min(int(xfc+V*H),Rx),int(V*2*H))
 
 
-
         cv2.rectangle(img,(int(xfc),int(yfc)),(int(xfc+5),int(yfc+5)),(255,255,255),2)
         print(faces)
         print('data', ["ymin =",ymin, "ymax=",ymax,"xmin=", xmin,"xmax=", xmax, "xfc=",xfc,"yfc=", yfc])
