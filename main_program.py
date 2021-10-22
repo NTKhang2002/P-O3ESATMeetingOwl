@@ -9,13 +9,16 @@ import argparse
 
 
 class people:
-    def __init__(self,fx,fy,t,hx,hy,hs):
+    id = 0
+    def __init__(self,id,fx,fy,t,hx,hy,hs):
         """
         fx, fy: face position
         t: talking status
         hx, hy: hand position
         hs: hand status
         """
+        people.id += 1
+        self.id = people.id
         self.fx = fx
         self.fy = fy
         self.t = t
@@ -31,6 +34,10 @@ class people:
         self.hs = hs
     def x_position_face(self):
         return self.fx
+    def x_position_hand(self):
+        return self.hx
+    def show_data(self):
+        return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs
 
 def argsfunc():
     # construct the argument parse and parse the arguments
@@ -43,7 +50,7 @@ def argsfunc():
     return args
 
 def main(detectionCon = 0.8, maxHands = 4):
-    print("Initializing")
+    print("Initializing...")
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     cap.set(3, 1000)
     cap.set(4, 100)
@@ -51,20 +58,30 @@ def main(detectionCon = 0.8, maxHands = 4):
     args = argsfunc()
     detector_face = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(args["shape_predictor"])
-    for k in range(100)
-    success, img = cap.read()
-    hands, img = detector.findHands(img)
-    handstatus = sh.hand_status(detector, hands)
-    for i in handstatus:
-        print(i)
-    sleep(100)
+    for k in range(25):
+        success, img = cap.read()
+        hands, img = detector.findHands(img)
+        handstatus = sh.hand_status(detector, hands)
+    j = 0
+    persons = list()
+    for person in handstatus:
+        persons.append(people(j,None,None,None,person[1],person[2],person[0]))
+        j += 1
+    for p in range(len(persons)):
+        print(persons[p].show_data())
+    print("Initialization complete")
     while True:
         success, img = cap.read()
         hands, img = detector.findHands(img)
         handstatus = sh.hand_status(detector, hands)
+        for person in handstatus:
+            hx = person[1]
+            for old_person in persons:
+                old_hx = old_person.x_position_hand()
+                if abs(hx - old_hx) < 100:
+                    old_person.add_data(None,None,None,person[1], person[2],person[0])
+        print(persons[0].show_data())
         img = detect_open_mouth_test.main(img,detector_face,predictor)
-        for i in handstatus:
-            print(i)
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break

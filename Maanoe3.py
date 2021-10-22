@@ -26,6 +26,7 @@ mond_algemeen = False
 
 
 
+
 class player:
     def __init__(self, fx, fy):
         self.fx = fx
@@ -37,12 +38,12 @@ class player:
 
 
 
-persoon_1 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_1', 'tijd': 0, 'mond': False}
-persoon_2 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_2', 'tijd': 0, 'mond': False}
-persoon_3 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_3', 'tijd': 0, 'mond': False}
-persoon_4 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_4', 'tijd': 0, 'mond': False}
+def assign(x, y):
 
-persoon_teller = 0
+
+    break
+
+
 
 
 def mouth_aspect_ratio(mouth):
@@ -109,7 +110,7 @@ while True:
     # loop over the face detections
     for rect in rects:
 
-        persoon_teller += 1
+
         # determine the facial landmarks for the face region, then
         # convert the facial landmark (x, y)-coordinates to a NumPy
         # array
@@ -148,44 +149,6 @@ while True:
 
 
 
-        if persoon_1['present'] == False:
-            persoon_1['present'] = True
-            persoon_1['position'] = [x, y]
-            persoon_1['tijd'] = time.time()
-
-            if mond_algemeen:
-                persoon_1['mond'] = True
-            else:
-                persoon_1['mond'] = False
-
-        elif (x -50) < persoon_1['position'][0] < (x + 50):
-            persoon_1['position'] = [x, y]
-            persoon_1['tijd'] = time.time()
-
-            if mond_algemeen:
-                persoon_1['mond'] = True
-            else:
-                persoon_1['mond'] = False
-
-        elif persoon_2['present'] == False:
-            persoon_2['present'] = True
-            persoon_2['position'] = [x, y]
-            persoon_2['tijd'] = time.time()
-
-            if mond_algemeen:
-                persoon_2['mond'] = True
-            else:
-                persoon_2['mond'] = False
-
-        elif (x - 50) < persoon_2['position'][0] < (x + 50):
-            persoon_2['position'] = [x, y]
-            persoon_2['tijd'] = time.time()
-
-            if mond_algemeen:
-                persoon_2['mond'] = True
-            else:
-                persoon_2['mond'] = False
-
 
 
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
@@ -197,20 +160,6 @@ while True:
 
     persoon_teller = 0
 
-    if persoon_1['present'] == True:
-        cv2.putText(frame, 'persoon_1', (persoon_1['position'][0], persoon_1['position'][1]),
-        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-
-        color = GREEN
-
-
-
-
-    if persoon_2['present'] == True:
-        cv2.putText(frame, 'persoon_2', (persoon_2['position'][0], persoon_2['position'][1]),
-        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-
-        color = GREEN
 
 
 
@@ -219,17 +168,6 @@ while True:
     if key == ord("q"):
         break
 
-    tijd = time.time()
-    if tijd - persoon_1['tijd'] > 5:
-        persoon_1['position'] = [-1000, -1000]
-        persoon_1['present'] = False
-
-    if tijd - persoon_2['tijd'] > 5:
-        persoon_2['position'] = [-1000,-1000]
-        persoon_2['present'] = False
-
-    print('persoon1: ' + str(persoon_1['position']), 'persoon2: ' + str(persoon_2['position']))
-    print(str(tijd - persoon_1['tijd']),str(tijd - persoon_2['tijd']))
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
