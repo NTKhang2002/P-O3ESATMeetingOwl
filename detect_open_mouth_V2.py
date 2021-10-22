@@ -16,25 +16,15 @@ import cv2
 
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
-
 people = []
 
 def mouth_aspect_ratio(mouth):
-    # compute the euclidean distances between the two sets of
-    # vertical mouth landmarks (x, y)-coordinates
-    A = dist.euclidean(mouth[2], mouth[10])  # 51, 59
-    B = dist.euclidean(mouth[4], mouth[8])  # 53, 57
+	A = dist.euclidean(mouth[12], mouth[18])
+	B = dist.euclidean(mouth[13], mouth[17])
+	C = dist.euclidean(mouth[14], mouth[16])
 
-    # compute the euclidean distance between the horizontal
-    # mouth landmark (x, y)-coordinates
-    C = dist.euclidean(mouth[0], mouth[6])  # 49, 55
-
-    # compute the mouth aspect ratio
-    mar = (A + B) / (2.0 * C)
-
-    # return the mouth aspect ratio
-    return mar
-
+	mar = (A + B + C) / 3.0
+	return mar
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -45,7 +35,7 @@ ap.add_argument("-w", "--webcam", type=int, default=0,
 args = vars(ap.parse_args())
 
 # define one constants, for mouth aspect ratio to indicate open mouth
-MOUTH_AR_THRESH = 2.5
+MOUTH_AR_THRESH = 8
 
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
