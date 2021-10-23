@@ -9,9 +9,9 @@ CLASSIFIERS = "haarcascade_frontalface_default.xml"
 # Create cascade
 FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
 # Capture from camera, 0 because webcam
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH,  WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
 
 
