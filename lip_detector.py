@@ -42,7 +42,8 @@ class player:
         self.closed_2 = 1
         self.teller_open = 0
         self.open = [10, 0, 0, 0, 0]
-
+    def return_tuple(self):
+        return (self.fx,self.fy,self.talking)
 
 participant_1 = player(-1000,-1000)
 participant_1.name = "participant 1"
@@ -60,7 +61,7 @@ def update(participant, x, y):
     participant.fx = x
     participant.fy = y
     participant.tijd = time.time()
-    print(participant.name + ": " + str(x),str(y))
+    # print(participant.name + ": " + str(x),str(y))
     participant.present = True
 
     if mond_algemeen:
@@ -83,7 +84,7 @@ def update(participant, x, y):
 
     elif (participant.open[participant.teller_open] - participant.open[participant.teller_open - 4]) < 2:
         participant.talking = True
-        print(participant.name, ": TALKING")
+        # print(participant.name, ": TALKING")
 
 
 def localiser(participant, x):
@@ -154,7 +155,7 @@ def mouth_aspect_ratio(mouth):
 
 
 # grab the indexes of the facial landmarks for the mouth
-(mStart, mEnd) = (49, 68)
+# (mStart, mEnd) = (49, 68)
 
 # start the video stream thread
 #vs = VideoStream(src=args["webcam"]).start()
@@ -164,9 +165,9 @@ def mouth_aspect_ratio(mouth):
 #frame_width = 640
 #frame_height = 360
 
-#Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
-#out = cv2.VideoWriter('outpy.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30, (frame_width, frame_height))
-#time.sleep(1.0)
+# Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
+# out = cv2.VideoWriter('outpy.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30, (frame_width, frame_height))
+# time.sleep(1.0)
 
 
 def lipdetector(frame, detector,predictor, MOUTH_AR_THRESH = 0.70, mStart = 49, mEnd = 68):
@@ -236,4 +237,7 @@ def lipdetector(frame, detector,predictor, MOUTH_AR_THRESH = 0.70, mStart = 49, 
             check(k)
 
 
+def face_status():
+    for participant in participant_list:
+        yield participant.return_tuple()
 
