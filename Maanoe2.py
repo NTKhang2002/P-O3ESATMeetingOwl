@@ -22,7 +22,7 @@ tijd = time.time()
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
 
-mond_algemeen = False
+mouth_algemeen = False
 
 
 
@@ -134,14 +134,14 @@ while True:
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
             color = BLUE
-            mond_algemeen = True
+            mouth_algemeen = True
 
 
         else:
             cv2.putText(frame, "MOUTH CLOSED", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             color = GREEN
-            mond_algemeen = False
+            mouth_algemeen = False
 
         # Visualize the mouth in green
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)      #Square over face
@@ -153,7 +153,7 @@ while True:
             persoon_1['position'] = [x, y]
             persoon_1['tijd'] = time.time()
 
-            if mond_algemeen:
+            if mouth_algemeen:
                 persoon_1['mond'] = True
             else:
                 persoon_1['mond'] = False
@@ -162,7 +162,7 @@ while True:
             persoon_1['position'] = [x, y]
             persoon_1['tijd'] = time.time()
 
-            if mond_algemeen:
+            if mouth_algemeen:
                 persoon_1['mond'] = True
             else:
                 persoon_1['mond'] = False
@@ -172,7 +172,7 @@ while True:
             persoon_2['position'] = [x, y]
             persoon_2['tijd'] = time.time()
 
-            if mond_algemeen:
+            if mouth_algemeen:
                 persoon_2['mond'] = True
             else:
                 persoon_2['mond'] = False
@@ -181,7 +181,7 @@ while True:
             persoon_2['position'] = [x, y]
             persoon_2['tijd'] = time.time()
 
-            if mond_algemeen:
+            if mouth_algemeen:
                 persoon_2['mond'] = True
             else:
                 persoon_2['mond'] = False

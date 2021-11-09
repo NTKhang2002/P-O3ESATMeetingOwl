@@ -129,11 +129,6 @@ def assign(x, y):
         update(participant_4, x, y)
 
 
-
-
-
-
-
 def mouth_aspect_ratio(mouth):
     # compute the euclidean distances between the two sets of
     # vertical mouth landmarks (x, y)-coordinates
