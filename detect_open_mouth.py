@@ -38,7 +38,7 @@ def mouth_aspect_ratio(mouth):
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--shape-predictor", required=False, default='shape_predictor_68_face_landmarks.dat',
                 help="path to facial landmark predictor")
-ap.add_argument("-w", "--webcam", type=int, default=0,
+ap.add_argument("-w", "--webcam", type=int, default=1,
                 help="index of webcam on system")
 args = vars(ap.parse_args())
 
@@ -61,7 +61,7 @@ vs = VideoStream(src=args["webcam"]).start()
 time.sleep(1.0)
 
 frame_width = 640
-frame_height = 360
+frame_height = 380
 
 # Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
 out = cv2.VideoWriter('outpy.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30, (frame_width, frame_height))

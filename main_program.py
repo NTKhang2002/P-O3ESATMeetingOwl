@@ -6,11 +6,11 @@ import face_test
 import detect_open_mouth_test
 import dlib
 import argparse
-
+import lip_detector
 
 class people:
     id = 0
-    def __init__(self,id,fx,fy,t,hx,hy,hs):
+    def __init__(self,fx,fy,t,hx,hy,hs):
         """
         fx, fy: face position
         t: talking status
@@ -25,16 +25,17 @@ class people:
         self.hx = hx
         self.hy = hy
         self.hs = hs
-    def add_data(self,fx,fy,t,hx,hy,hs):
-        self.fx = fx
-        self.fy = fy
-        self.t = t
+    def add_handdata(self,hx,hy,hs):
         self.hx = hx
         self.hy = hy
         self.hs = hs
-    def x_position_face(self):
+    def add_facedata(self,fx,fy,t):
+        self.fx = fx
+        self.fy = fy
+        self.t = t
+    def show_fx(self):
         return self.fx
-    def x_position_hand(self):
+    def show_hx(self):
         return self.hx
     def show_data(self):
         return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs
@@ -60,13 +61,11 @@ def main(detectionCon = 0.8, maxHands = 4):
     predictor = dlib.shape_predictor(args["shape_predictor"])
     for k in range(25):
         success, img = cap.read()
-        hands, img = detector.findHands(img)
-        handstatus = sh.hand_status(detector, hands)
-    j = 0
+        lip_detector.lipdetector(img,detector_face,predictor)
+        facestatus = lip_detector.face_status()
     persons = list()
-    for person in handstatus:
-        persons.append(people(j,None,None,None,person[1],person[2],person[0]))
-        j += 1
+    for person in facestatus:
+        persons.append(people(person[0],person[1],person[2],None,None,None))
     for p in range(len(persons)):
         print(persons[p].show_data())
     print("Initialization complete")
@@ -77,14 +76,22 @@ def main(detectionCon = 0.8, maxHands = 4):
         for person in handstatus:
             hx = person[1]
             for old_person in persons:
-                old_hx = old_person.x_position_hand()
-                if abs(hx - old_hx) < 100:
-                    old_person.add_data(None,None,None,person[1], person[2],person[0])
-        print(persons[0].show_data())
-        img = detect_open_mouth_test.main(img,detector_face,predictor)
+                old_fx = old_person.show_fx()
+                if abs(hx - old_fx) < 100:
+                    old_person.add_handdata(person[1], person[2],person[0])
+        #print(persons[0].show_data())
+        img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
+        facestatus = lip_detector.face_status()
+        for person in facestatus:
+            fx = person[0]
+            for old_person in persons:
+                old_fx = old_person.show_fx()
+                if abs(fx - old_fx) < 100:
+                    old_person.add_facedata(person[0],person[1],person[2])
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
-
 if __name__ == '__main__':
     main()
+
+

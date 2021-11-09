@@ -1,20 +1,20 @@
 import cv2
 
-HEIGHT = 720
-WIDTH = 16/9 * HEIGHT
-
+WIDTH = 800
+HEIGHT = 450
 # creating a variable with the classifiers
 CLASSIFIERS = "haarcascade_frontalface_default.xml"
 
 # Create cascade
 FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
 # Capture from camera, 0 because webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-cap.set(cv2.CAP_PROP_FRAME_WIDTH,  WIDTH)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-
-
+width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+print(width, height)
 def zoom(img,faces, face=0):
     if not faces == () and len(faces) >= face + 1:
         X = faces[face][0]
@@ -29,10 +29,11 @@ def zoom(img,faces, face=0):
         xfc = X + W/2
         yfc = Y + H/2
 
-        ymin = max(min(int(yfc-H),int(Ry-2*H)),0)
+        ymin = max(min(int(yfc-H)-1,int(Ry-2*H)),0)
         ymax = max(min(int(yfc+H),Ry),int(2*H))
-        xmin = max(min(int(xfc-V*H),int(Rx-V*2*H)),0)
+        xmin = max(min(int(xfc-V*H)-1,int(Rx-V*2*H)),0)
         xmax = max(min(int(xfc+V*H),Rx),int(V*2*H))
+
 
 
         cv2.rectangle(img,(int(xfc),int(yfc)),(int(xfc+5),int(yfc+5)),(255,255,255),2)
@@ -63,6 +64,3 @@ while True:
     if toets == 27:
         break
 cap.release()
-
-
-
