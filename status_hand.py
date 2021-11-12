@@ -1,31 +1,28 @@
-import cv2
-import time
-
+import cv2 #(1)
 from cvzone.HandTrackingModule import HandDetector
-cap = cv2.VideoCapture(0)
-cap.set(3,1000)
-cap.set(4,100)
-
+cap = cv2.VideoCapture(0)#(1)
 detector = HandDetector(detectionCon=0.8,maxHands=4)
 
-while True:
-    success, img = cap.read()
-    hands, img = detector.findHands(img)
-
+def want_to_talk(hands):
     if hands:
-        hand1 = hands[0]
-        print('hand 1')
-        fingers1 = detector.fingersUp(hand1)
-        if fingers1 == [0,0,0,0,0]:
-            print('gesloten')
-        elif fingers1 == [1,1,1,1,1] or fingers1 == [0,1,1,1,1]:
-            print('ik wil praten')
-        if len(hands) > 1:
-            hand2 = hands[1]
-            print('tweede hand')
+        nobody = True
+        for hand in hands:
+            # print('hand 1')
+            fingers = detector.fingersUp(hand)
+            if fingers == [1, 1, 1, 1]:
+                print('want tot talk')
+                nobody = False
+        if nobody:
+            print('nobody wants tot talk')
+    if not hands:
+        print('nobody wants tot talk')
+
+while True: #(1)
+    success, img = cap.read()#(1)
+    hands, img = detector.findHands(img)
+    want_to_talk(hands)
+    cv2.imshow("image", img) #(1)
+    cv2.waitKey(1) #(1)
 
 
 
-
-    cv2.imshow("image", img)
-    cv2.waitKey(1)
