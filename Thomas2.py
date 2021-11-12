@@ -1,6 +1,6 @@
 import cv2, time
 
-cap = cv2.VideoCapture("rtsp://admin:admin@192.168.1.30:554/11")
+cap = cv2.VideoCapture("rtsp://admin:123456@10.46.144.194")
 
 time.sleep(2)
 
@@ -25,32 +25,28 @@ def perform_move(ptz, request, timeout):
 
 
 def move_up(ptz, request, timeout=2):
-    print
-    'move up...'
+    print('move up...')
     request.Velocity.PanTilt._x = 0
     request.Velocity.PanTilt._y = YMAX
     perform_move(ptz, request, timeout)
 
 
 def move_down(ptz, request, timeout=2):
-    print
-    'move down...'
+    print('move down...')
     request.Velocity.PanTilt._x = 0
     request.Velocity.PanTilt._y = YMIN
     perform_move(ptz, request, timeout)
 
 
 def move_right(ptz, request, timeout=2):
-    print
-    'move right...'
+    print('move right...')
     request.Velocity.PanTilt._x = XMAX
     request.Velocity.PanTilt._y = 0
     perform_move(ptz, request, timeout)
 
 
 def move_left(ptz, request, timeout=2):
-    print
-    'move left...'
+    print('move left...')
     request.Velocity.PanTilt._x = XMIN
     request.Velocity.PanTilt._y = 0
     perform_move(ptz, request, timeout)
@@ -64,9 +60,8 @@ def continuous_move():
     ptz = mycam.create_ptz_service()
 
     # Get target profile
-    media_profile = media.GetProfiles()[0];
-    print
-    media_profile
+    media_profile = media.GetProfiles()[0]
+    print(media_profile)
 
     # Get PTZ configuration options for getting continuous move range
     request = ptz.create_type('GetConfigurationOptions')
@@ -105,13 +100,11 @@ def continuous_move():
 while (True):
 
     ret, frame = cap.read()
-    print
-    ret
+    print(ret)
     if ret == 1:
         cv2.imshow('frame', frame)
     else:
-        print
-        "no video"
+        print("no video")
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
