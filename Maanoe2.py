@@ -14,14 +14,35 @@ import time
 import dlib
 import cv2
 
+
+
+tijd = time.time()
+
+
 BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
 
-persoon_1 = [0, 0]
-persoon_2 = [0, 0]
-persoon_3 = [0, 0]
+mouth_algemeen = False
 
 
+
+class player:
+    def __init__(self, fx, fy):
+        self.fx = fx
+        self.fy = fy
+        self.talking = False
+        self.present = False
+        self.tijd = 0
+        self.mouth = False
+
+
+
+persoon_1 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_1', 'tijd': 0, 'mond': False}
+persoon_2 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_2', 'tijd': 0, 'mond': False}
+persoon_3 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_3', 'tijd': 0, 'mond': False}
+persoon_4 = {'position': [-1000, -1000], 'talking': False , 'present': False , 'naam': 'persoon_4', 'tijd': 0, 'mond': False}
+
+persoon_teller = 0
 
 
 def mouth_aspect_ratio(mouth):
@@ -87,6 +108,8 @@ while True:
 
     # loop over the face detections
     for rect in rects:
+
+        persoon_teller += 1
         # determine the facial landmarks for the face region, then
         # convert the facial landmark (x, y)-coordinates to a NumPy
         # array
@@ -106,21 +129,65 @@ while True:
         (x, y, w, h) = face_utils.rect_to_bb(rect)
         cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-
-
         # Draw text if mouth is open + visualize the mouth in blue
         if mar > MOUTH_AR_THRESH:
             cv2.putText(frame, "MOUTH OPEN", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
             color = BLUE
+            mouth_algemeen = True
 
 
         else:
             cv2.putText(frame, "MOUTH CLOSED", (30, 60),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             color = GREEN
+            mouth_algemeen = False
+
         # Visualize the mouth in green
-        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)      #Square over face
+
+
+
+        if persoon_1['present'] == False:
+            persoon_1['present'] = True
+            persoon_1['position'] = [x, y]
+            persoon_1['tijd'] = time.time()
+
+            if mouth_algemeen:
+                persoon_1['mond'] = True
+            else:
+                persoon_1['mond'] = False
+
+        elif (x -50) < persoon_1['position'][0] < (x + 50):
+            persoon_1['position'] = [x, y]
+            persoon_1['tijd'] = time.time()
+
+            if mouth_algemeen:
+                persoon_1['mond'] = True
+            else:
+                persoon_1['mond'] = False
+
+        elif persoon_2['present'] == False:
+            persoon_2['present'] = True
+            persoon_2['position'] = [x, y]
+            persoon_2['tijd'] = time.time()
+
+            if mouth_algemeen:
+                persoon_2['mond'] = True
+            else:
+                persoon_2['mond'] = False
+
+        elif (x - 50) < persoon_2['position'][0] < (x + 50):
+            persoon_2['position'] = [x, y]
+            persoon_2['tijd'] = time.time()
+
+            if mouth_algemeen:
+                persoon_2['mond'] = True
+            else:
+                persoon_2['mond'] = False
+
+
+
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
     # Write the frame into the file 'output.avi'
     out.write(frame)
@@ -128,9 +195,41 @@ while True:
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 
+    persoon_teller = 0
+
+    if persoon_1['present'] == True:
+        cv2.putText(frame, 'persoon_1', (persoon_1['position'][0], persoon_1['position'][1]),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+        color = GREEN
+
+
+
+
+    if persoon_2['present'] == True:
+        cv2.putText(frame, 'persoon_2', (persoon_2['position'][0], persoon_2['position'][1]),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+        color = GREEN
+
+
+
+
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
         break
+
+    tijd = time.time()
+    if tijd - persoon_1['tijd'] > 5:
+        persoon_1['position'] = [-1000, -1000]
+        persoon_1['present'] = False
+
+    if tijd - persoon_2['tijd'] > 5:
+        persoon_2['position'] = [-1000,-1000]
+        persoon_2['present'] = False
+
+    print('persoon1: ' + str(persoon_1['position']), 'persoon2: ' + str(persoon_2['position']))
+    print(str(tijd - persoon_1['tijd']),str(tijd - persoon_2['tijd']))
 
 # do a bit of cleanup
 cv2.destroyAllWindows()
