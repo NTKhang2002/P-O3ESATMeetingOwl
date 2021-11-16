@@ -26,11 +26,6 @@ xmin, xmax, ymin, ymax = 0, WIDTH, 0, HEIGHT
 
 
 def zoomboundaries(img, X, Y, W, H):
-    """X = faces[face][0]
-    Y = faces[face][1]
-    W = faces[face][2]
-    H = faces[face][3]"""
-
     Ry = img.shape[0]
     Rx = img.shape[1]
     V = Rx / Ry
@@ -95,7 +90,7 @@ while True:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)"""
 
     Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
-    interpolatielijst[int(i % tijd)] = [Xf,Yf,Wf,Hf]
+    interpolatielijst[i % tijd] = [Xf,Yf,Wf,Hf]
     print(interpolatielijst)
 
     if i > tijd:
