@@ -38,7 +38,12 @@ class people:
         return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs
     def is_talking(self):
         return self.t
-
+    def hand_status(self):
+        return self.hs
+    def reset_hands(self):
+        self.hx = None
+        self.hy = None
+        self.hs = None
 def argsfunc():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
@@ -49,14 +54,42 @@ def argsfunc():
     args = vars(ap.parse_args())
     return args
 
-def choose_person(persons):
+def choose_person(persons,person_tracked,hand_queue):
     """
     Returns x value (face) of person that is talking
     """
     for person in persons:
-        if person.is_talking():
-            return person.show_fx()
-
+        if person.hand_status() == 1:
+            if person not in hand_queue:
+                hand_queue.append(person)
+    if person_tracked:
+        person_tracked = False
+        for person in persons:
+            if person.is_talking():
+                person_tracked = True
+                if person in hand_queue:
+                    hand_queue.remove(person)
+                return person.show_fx(), person_tracked, hand_queue
+        if not person_tracked:
+            if len(hand_queue) != 0:
+                next_person = hand_queue[0]
+                hand_queue.pop(0)
+                person_tracked = True
+                return next_person.show_fx(), person_tracked, hand_queue
+    else:
+        for person in persons:
+            if person.is_talking():
+                person_tracked = True
+                if person in hand_queue:
+                    hand_queue.remove(person)
+                return person.show_fx(), person_tracked, hand_queue
+        if len(hand_queue) != 0:
+                next_person = hand_queue[0]
+                hand_queue.pop(0)
+                person_tracked = True
+                return next_person.show_fx(), person_tracked, hand_queue
+    person_tracked = False
+    return None, person_tracked, hand_queue
 def main(detectionCon = 0.8, maxHands = 4):
     """
     Main pipeline: calls and implements all modules
@@ -74,11 +107,13 @@ def main(detectionCon = 0.8, maxHands = 4):
     args = argsfunc()
     detector_face = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(args["shape_predictor"])
+    person_tracked = False
+    persons = list()
+    hand_queue = list()
     for k in range(25): # Initialization during first 25 frames
         success, img = cap.read()
         lip_detector.lipdetector(img,detector_face,predictor)
         facestatus = lip_detector.face_status()
-    persons = list()
     for person in facestatus:
         persons.append(people(person[0],person[1],person[2],None,None,None))
     for p in range(len(persons)):
@@ -94,6 +129,8 @@ def main(detectionCon = 0.8, maxHands = 4):
         success, img = cap.read() # initial image (clean)
         hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
         handstatus = sh.hand_status(detector, hands)
+        for person in persons:
+            person.reset_hands()
         for person in handstatus:
             hx = person[1]
             for old_person in persons:
@@ -109,7 +146,7 @@ def main(detectionCon = 0.8, maxHands = 4):
                 old_fx = old_person.show_fx()
                 if abs(fx - old_fx) < 100:  # (1)
                     old_person.add_facedata(person[0],person[1],person[2])
-        instruction = choose_person(persons)
+        instruction,person_tracked,hand_queue = choose_person(persons,person_tracked,hand_queue)
         print(instruction)
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
