@@ -133,10 +133,21 @@ def main(detectionCon = 0.8, maxHands = 4):
             person.reset_hands()
         for person in handstatus:
             hx = person[1]
+            min_distance = None
+            min_person = None
             for old_person in persons:
                 old_fx = old_person.show_fx()
-                if abs(hx - old_fx) < 100:  # New x value compared with old x value, if within predefined range -> data is updated (1)
-                    old_person.add_handdata(person[1], person[2],person[0])
+                if min_distance == None:
+                    min_distance = abs(hx - old_fx)
+                    min_person = old_person
+                else:
+                    if abs(hx-old_fx) < min_distance:
+                        min_distance = abs(hx-old_fx)
+                        min_person = old_person
+            min_person.add_handdata(person[1], person[2],person[0])
+
+                # if abs(hx - old_fx) < 100:  # New x value compared with old x value, if within predefined range -> data is updated (1)
+                #     old_person.add_handdata(person[1], person[2],person[0])
         # input: image with hand visualization, output: image with hand visualization and lip visualization (2)
         img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
         facestatus = lip_detector.face_status()
