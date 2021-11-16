@@ -2,8 +2,6 @@ from time import sleep
 import status_hand as sh
 import cv2
 from cvzone.HandTrackingModule import HandDetector
-import face_test
-import detect_open_mouth_test
 import dlib
 import argparse
 import lip_detector
@@ -39,6 +37,8 @@ class people:
         return self.hx
     def show_data(self):
         return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs
+    def is_talking(self):
+        return self.t
 
 def argsfunc():
     # construct the argument parse and parse the arguments
@@ -49,6 +49,11 @@ def argsfunc():
                     help="index of webcam on system")
     args = vars(ap.parse_args())
     return args
+
+def choose_person(persons):
+    for person in persons:
+        if person.is_talking():
+            return person.show_fx()
 
 def main(detectionCon = 0.8, maxHands = 4):
     print("Initializing...")
@@ -79,7 +84,6 @@ def main(detectionCon = 0.8, maxHands = 4):
                 old_fx = old_person.show_fx()
                 if abs(hx - old_fx) < 100:
                     old_person.add_handdata(person[1], person[2],person[0])
-        #print(persons[0].show_data())
         img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
         facestatus = lip_detector.face_status()
         for person in facestatus:
@@ -88,6 +92,8 @@ def main(detectionCon = 0.8, maxHands = 4):
                 old_fx = old_person.show_fx()
                 if abs(fx - old_fx) < 100:
                     old_person.add_facedata(person[0],person[1],person[2])
+        instruction = choose_person(persons)
+        print(instruction)
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
