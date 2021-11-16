@@ -1,4 +1,3 @@
-from time import sleep
 import status_hand as sh
 import cv2
 from cvzone.HandTrackingModule import HandDetector
@@ -51,12 +50,23 @@ def argsfunc():
     return args
 
 def choose_person(persons):
+    """
+    Returns x value (face) of person that is talking
+    """
     for person in persons:
         if person.is_talking():
             return person.show_fx()
 
 def main(detectionCon = 0.8, maxHands = 4):
+    """
+    Main pipeline: calls and implements all modules
+    """
     print("Initializing...")
+    """
+    Initialization phase: 
+        - Initializing video capture, hand detector, argument parser, face detector and shape predictor
+        - Creating initial 'person' objects
+    """
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     cap.set(3, 1000)
     cap.set(4, 100)
@@ -64,7 +74,7 @@ def main(detectionCon = 0.8, maxHands = 4):
     args = argsfunc()
     detector_face = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(args["shape_predictor"])
-    for k in range(25):
+    for k in range(25): # Initialization during first 25 frames
         success, img = cap.read()
         lip_detector.lipdetector(img,detector_face,predictor)
         facestatus = lip_detector.face_status()
@@ -75,22 +85,29 @@ def main(detectionCon = 0.8, maxHands = 4):
         print(persons[p].show_data())
     print("Initialization complete")
     while True:
-        success, img = cap.read()
-        hands, img = detector.findHands(img)
+        """
+        Main loop: 
+            - Creating and showing image
+            - Updating 'person' objects with relevant data using the correct modules
+            - Creating instruction for Arduino
+        """
+        success, img = cap.read() # initial image (clean)
+        hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
         handstatus = sh.hand_status(detector, hands)
         for person in handstatus:
             hx = person[1]
             for old_person in persons:
                 old_fx = old_person.show_fx()
-                if abs(hx - old_fx) < 100:
+                if abs(hx - old_fx) < 100:  # New x value compared with old x value, if within predefined range -> data is updated (1)
                     old_person.add_handdata(person[1], person[2],person[0])
+        # input: image with hand visualization, output: image with hand visualization and lip visualization (2)
         img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
         facestatus = lip_detector.face_status()
         for person in facestatus:
             fx = person[0]
             for old_person in persons:
                 old_fx = old_person.show_fx()
-                if abs(fx - old_fx) < 100:
+                if abs(fx - old_fx) < 100:  # (1)
                     old_person.add_facedata(person[0],person[1],person[2])
         instruction = choose_person(persons)
         print(instruction)
