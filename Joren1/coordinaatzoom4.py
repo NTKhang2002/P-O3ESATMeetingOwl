@@ -5,9 +5,9 @@ WIDTH = int(16/9 * HEIGHT)
 face = 0
 tijd = 5
 interpolatielijst = list()
-nextcord = list()
-prevcord = list()
-
+nextcord = [None, None, None, None]
+prevcord = [None, None, None, None]
+Xf, Yf, Wf, Hf = None, None, None, None
 
 
 # creating a variable with the classifiers
@@ -32,6 +32,8 @@ def zoomboundaries(img,X, Y, W, H):
     Y = faces[face][1]
     W = faces[face][2]
     H = faces[face][3]"""
+    H = 209
+    W = 209
 
     Ry = img.shape[0]
     Rx = img.shape[1]
@@ -44,7 +46,6 @@ def zoomboundaries(img,X, Y, W, H):
     ymax = max(min(int(yfc + H), Ry), int(2 * H))
     xmin = max(min(int(xfc - V * H), int(Rx - V * 2 * H)), 0)
     xmax = max(min(int(xfc + V * H), Rx), int(V * 2 * H))
-    print(xmin,xmax,ymin,ymax)
     return xmin,xmax,ymin,ymax
 
 def crop(img,xmin,xmax,ymin,ymax):
@@ -56,54 +57,57 @@ def resizer(img, Width, Height):
     return imgresized
 
 def coordinaatgezicht(faces, face):
-    X = faces[face][0]
-    Y = faces[face][1]
-    W = faces[face][2]
-    H = faces[face][3]
+    if faces != () and len(faces) >= face + 1:
+        X = faces[face][0]
+        Y = faces[face][1]
+        W = faces[face][2]
+        H = faces[face][3]
 
-    return X,Y,W,H
+        return X,Y,W,H
+    return None,None,None,None
 
 
 def interpolatiepad(prevcord, nextcord, tijd):
-    if not prevcord and nextcord == list():
-        X1, Y1, W1, H1 = prevcord[0], prevcord[1], prevcord[2], prevcord[3]
-        X2, Y2, W2, H2 = nextcord[0], nextcord[1], nextcord[2], nextcord[3]
-        k = tijd
-        interpolatielijst = list()
-        for i in range(tijd):
-            i += 1
-            interpolatielijst.append([(k - i) / tijd * X1 + i / tijd * X2, (k - i) / tijd * Y1 + i / tijd * Y2,
-                                      (k - i) / tijd * W1 + i / tijd * W2, (k - i) / tijd * H1 + i / tijd * H2])
+    X1, Y1, W1, H1 = prevcord[0], prevcord[1], prevcord[2], prevcord[3]
+    X2, Y2, W2, H2 = nextcord[0], nextcord[1], nextcord[2], nextcord[3]
+    k = tijd
+    interpolatielijst = list()
+    for i in range(tijd):
+        i += 1
+        interpolatielijst.append([int((k - i) / tijd * X1 + i / tijd * X2), int((k - i) / tijd * Y1 + i / tijd * Y2),
+                                  int((k - i) / tijd * W1 + i / tijd * W2), int((k - i) / tijd * H1 + i / tijd * H2)])
+    return interpolatielijst
 
-        return interpolatielijst
-    else:
-        return None
 
 
 i = 0
 while True:
     status, img = cap.read()
-
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Detect the faces
     faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
+    if list(coordinaatgezicht(faces,face)) != [None,None,None,None]:
+        nextcord = list(coordinaatgezicht(faces,face))
+
     if i % tijd == 0:
+        if prevcord != [None, None, None, None]:
+            interpolatielijst = interpolatiepad(prevcord,nextcord,tijd)
         prevcord = nextcord
-        Xnext, Ynext, Wnext, Hnext = coordinaatgezicht(faces, face)
-        nextcord = [Xnext,Ynext,Wnext,Hnext]
-        interpolatielijst = interpolatiepad(nextcord,prevcord,tijd)
 
 
-    if i % tijd !=0 and interpolatielijst != None:
-        Xf, Yf, Wf, Hf = interpolatielijst[i - (i//tijd) - 1][0],interpolatielijst[i - (i//tijd) - 1][1],interpolatielijst[i - (i//tijd) - 1][2],interpolatielijst[i - (i//tijd) - 1][3]
+    if i % tijd != 0 and interpolatielijst != list():
+        Xf, Yf, Wf, Hf = int(interpolatielijst[i%tijd][0]), int(interpolatielijst[i%tijd][1]), \
+                         int(interpolatielijst[i%tijd][2]), int(interpolatielijst[i%tijd][3])
+        print(Xf, Yf, Wf, Hf)
+    else: Xf, Yf, Wf, Hf = [nextcord[0], nextcord[1], nextcord[2], nextcord[3]]
 
 
-    if faces != () and len(faces) >= face + 1:
-        (xmin,xmax,ymin,ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf)
+    if faces != () and len(faces) >= face + 1 and Xf != None:
 
+        (xmin, xmax, ymin, ymax) = zoomboundaries(img, Xf,Yf,Wf,Hf)
 
     imgcropped = crop(img,xmin,xmax,ymin,ymax)
     imgresized = resizer(imgcropped,WIDTH,HEIGHT)
