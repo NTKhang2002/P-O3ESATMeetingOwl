@@ -94,15 +94,15 @@ def check(participant,tijd_algemeen,frame):
             participant.reset()
 
 
-
-def assign(x, y,mond_algemeen):
+def assign(x, y, mond_algemeen):
     for participant in participant_list:
         if not participant.present:
-            update(participant,x,y,mond_algemeen)
+            update(participant, x, y, mond_algemeen)
             break
-        elif localiser(participant,x):
-            update(participant,x,y,mond_algemeen)
+        elif localiser(participant, x):
+            update(participant, x, y, mond_algemeen)
             break
+
 
 def mouth_aspect_ratio(mouth):
     # compute the euclidean distances between the two sets of
