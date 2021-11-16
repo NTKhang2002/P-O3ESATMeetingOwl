@@ -153,10 +153,22 @@ def main(detectionCon = 0.8, maxHands = 4):
         facestatus = lip_detector.face_status()
         for person in facestatus:
             fx = person[0]
+            min_distance = None
+            min_person = None
             for old_person in persons:
                 old_fx = old_person.show_fx()
-                if abs(fx - old_fx) < 100:  # (1)
-                    old_person.add_facedata(person[0],person[1],person[2])
+                if min_distance == None:
+                    min_distance = abs(fx - old_fx)
+                    min_person = old_person
+                else:
+                    if abs(fx - old_fx) < min_distance:
+                        min_distance = abs(fx - old_fx)
+                        min_person = old_person
+            min_person.add_facedata(person[1], person[2], person[0])
+            # for old_person in persons:
+            #     old_fx = old_person.show_fx()
+            #     if abs(fx - old_fx) < 100:  # (1)
+            #         old_person.add_facedata(person[0],person[1],person[2])
         instruction,person_tracked,hand_queue = choose_person(persons,person_tracked,hand_queue)
         print(instruction)
         cv2.imshow("image", img)
