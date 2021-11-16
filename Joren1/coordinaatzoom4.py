@@ -2,8 +2,14 @@ import cv2
 
 HEIGHT = 480
 WIDTH = int(16/9 * HEIGHT)
-
 face = 0
+tijd = 5
+interpolatielijst = list()
+nextcord = list()
+prevcord = list()
+
+
+
 # creating a variable with the classifiers
 CLASSIFIERS = "haarcascade_frontalface_default.xml"
 
@@ -21,11 +27,11 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
 xmin, xmax, ymin, ymax = 0, WIDTH, 0, HEIGHT
 
 
-def zoomboundaries(img,faces, face = 0):
-    X = faces[face][0]
+def zoomboundaries(img,X, Y, W, H):
+    """X = faces[face][0]
     Y = faces[face][1]
     W = faces[face][2]
-    H = faces[face][3]
+    H = faces[face][3]"""
 
     Ry = img.shape[0]
     Rx = img.shape[1]
@@ -49,9 +55,32 @@ def resizer(img, Width, Height):
     imgresized = cv2.resize(img,(Width,Height))
     return imgresized
 
+def coordinaatgezicht(faces, face):
+    X = faces[face][0]
+    Y = faces[face][1]
+    W = faces[face][2]
+    H = faces[face][3]
+
+    return X,Y,W,H
 
 
+def interpolatiepad(prevcord, nextcord, tijd):
+    if not prevcord and nextcord == list():
+        X1, Y1, W1, H1 = prevcord[0], prevcord[1], prevcord[2], prevcord[3]
+        X2, Y2, W2, H2 = nextcord[0], nextcord[1], nextcord[2], nextcord[3]
+        k = tijd
+        interpolatielijst = list()
+        for i in range(tijd):
+            i += 1
+            interpolatielijst.append([(k - i) / tijd * X1 + i / tijd * X2, (k - i) / tijd * Y1 + i / tijd * Y2,
+                                      (k - i) / tijd * W1 + i / tijd * W2, (k - i) / tijd * H1 + i / tijd * H2])
 
+        return interpolatielijst
+    else:
+        return None
+
+
+i = 0
 while True:
     status, img = cap.read()
 
@@ -61,9 +90,19 @@ while True:
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
+    if i % tijd == 0:
+        prevcord = nextcord
+        Xnext, Ynext, Wnext, Hnext = coordinaatgezicht(faces, face)
+        nextcord = [Xnext,Ynext,Wnext,Hnext]
+        interpolatielijst = interpolatiepad(nextcord,prevcord,tijd)
+
+
+    if i % tijd !=0 and interpolatielijst != None:
+        Xf, Yf, Wf, Hf = interpolatielijst[i - (i//tijd) - 1][0],interpolatielijst[i - (i//tijd) - 1][1],interpolatielijst[i - (i//tijd) - 1][2],interpolatielijst[i - (i//tijd) - 1][3]
+
 
     if faces != () and len(faces) >= face + 1:
-        (xmin,xmax,ymin,ymax) = zoomboundaries(img, faces, face)
+        (xmin,xmax,ymin,ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf)
 
 
     imgcropped = crop(img,xmin,xmax,ymin,ymax)
@@ -80,5 +119,6 @@ while True:
 
     if toets == 27:
         break
+    i+=1
 
 cap.release()
