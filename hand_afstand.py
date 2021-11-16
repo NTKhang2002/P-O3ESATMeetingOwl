@@ -3,7 +3,7 @@ from cvzone.HandTrackingModule import HandDetector
 #1)
 cap = cv2.VideoCapture(0)
 #2)
-detector = HandDetector(detectionCon=0.8,maxHands=2)
+detector = HandDetector(detectionCon=0.8, maxHands=2)
 #1)
 while True:
     success, img = cap.read()
@@ -16,6 +16,7 @@ while True:
         bbox1 = hand1["bbox"]  # bounding box x,y,w,h
         centerPoint1 = hand1["center"]  # centrum van de hand cx,cy
         handType1 = hand1["type"]  # handtype links of rechts
+        print(centerPoint1)
 
         fingers1 = detector.fingersUp(hand1)
         length, info, img = detector.findDistance(lmList1[8], lmList1[12], img)
@@ -32,7 +33,5 @@ while True:
     cv2.imshow("image", img)
     if cv2.waitKey(1) == ord('q'):
         break
-
-
 
 #1) dit was om de camera aan te zetten
