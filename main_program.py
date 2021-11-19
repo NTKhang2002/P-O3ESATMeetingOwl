@@ -140,6 +140,7 @@ def main(detectionCon = 0.8, maxHands = 4):
     hand_queue = list()
     for k in range(25): # Initialization during first 25 frames
         success, img = cap.read()
+        img = imutils.resize(img, width=640)
         lip_detector.lipdetector(img,detector_face,predictor)
         facestatus = lip_detector.face_status()
     for person in facestatus:
@@ -156,6 +157,7 @@ def main(detectionCon = 0.8, maxHands = 4):
                 - Creating instruction for Arduino
             """
             success, img = cap.read() # initial image (clean)
+            img = imutils.resize(img, width=640)
             hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
             handstatus = sh.hand_status(detector, hands)
             for person in persons:
