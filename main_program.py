@@ -6,6 +6,7 @@ import dlib
 import argparse
 import pyvirtualcam
 import lip_detector
+import servo_controller
 
 hand1 = False
 hand2 = False
@@ -79,6 +80,8 @@ def choose_person(persons,person_tracked,hand_queue):
                     if hand1 == hand2 == True:
                         if handtime2 - handtime1 < 2:
                             hand_queue.clear()
+                            hand1 = False
+                            hand2 = False
                             return "Error", person_tracked, hand_queue
 
     if person_tracked:
@@ -144,7 +147,7 @@ def main(detectionCon = 0.8, maxHands = 4):
     for p in range(len(persons)):
         print(persons[p].show_data())
     print("Initialization complete")
-    with pyvirtualcam.Camera(width=960, height=540, fps=30) as cam:
+    with pyvirtualcam.Camera(width=640, height=480, fps=30) as cam:
         while True:
             """
             Main loop: 
@@ -198,6 +201,7 @@ def main(detectionCon = 0.8, maxHands = 4):
             print(instruction)
             if instruction == None:
                 print("ERROR: Make a decision!")
+            servo_controller.move(instruction)
             cv2.imshow("image", img)
             if cv2.waitKey(1) == ord('q'):
                 break

@@ -1,8 +1,5 @@
 import serial
 import time
-<<<<<<< HEAD
-nodeMcu = serial.Serial("COM10", 9600) #Sartup en kijk goed na welke poort
-=======
 import math
 
 nodeMcu = serial.Serial("COM10", 9600) #Sartup
@@ -21,7 +18,6 @@ def move(x):
     elif x == helft_pixels:
         angle = 90
 
->>>>>>> c60db7a9 (commit)
 
     nodeMcu.write(str(angle).encode())
 
