@@ -6,7 +6,8 @@ MIDDLEPOINTX = int(WIDTH/2)
 MIDDLEPOINTY = int(HEIGHT/2)
 tijd = 15
 interpolatielijst = [0]*tijd
-Central_bounding = int(MIDDLEPOINTX/1.4)
+# 1/2 for full screen[|---------------------|] , 1/4 to use only the middle part [-----|----------|-----]
+Central_bounding = int(1/2 * WIDTH)
 
 
 # creating a variable with the classifiers
@@ -67,11 +68,11 @@ def mostcentralface(width,faces):
         centerpoint = int(width/2)
         xlijst = list()
         for face in range(len(faces)):
-            xlijst.append(int(abs(centerpoint - faces[face][0])))
+            xlijst.append(int(abs(centerpoint - (faces[face][0]+faces[face][2]/2))))
         minx = min(xlijst)
         if minx <= Central_bounding:
             return xlijst.index(minx)
-    return 0
+    return False
 
 i = 0
 while True:
@@ -81,23 +82,26 @@ while True:
     faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-    cv2.rectangle(img, (Central_bounding,0),(WIDTH-Central_bounding,HEIGHT),(255,255,255),2)
+    cv2.rectangle(img, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
     face = mostcentralface(WIDTH,faces)
+    print(face)
 
-    if faces != () and len(faces) >= face + 1:
-        Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
+
+    if face is not False:
+        if faces != () and len(faces) >= face + 1:
+            Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
 
     interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
 
+    if face is not False:
+        if i > tijd:
+            Xf = gemiddeldelijst(interpolatielijst,0)
+            Yf = gemiddeldelijst(interpolatielijst,1)
+            Wf = gemiddeldelijst(interpolatielijst,2)
+            Hf = gemiddeldelijst(interpolatielijst,3)
 
-    if i > tijd:
-        Xf = gemiddeldelijst(interpolatielijst,0)
-        Yf = gemiddeldelijst(interpolatielijst,1)
-        Wf = gemiddeldelijst(interpolatielijst,2)
-        Hf = gemiddeldelijst(interpolatielijst,3)
-
-    if faces != () and len(faces) >= face + 1:
-        (xmin, xmax, ymin, ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf)
+        if faces != () and len(faces) >= face + 1:
+            (xmin, xmax, ymin, ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf)
 
     imgcropped = crop(img, xmin, xmax, ymin, ymax)
     imgresized = resizer(imgcropped, WIDTH, HEIGHT)
