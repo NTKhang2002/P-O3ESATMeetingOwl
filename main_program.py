@@ -7,9 +7,7 @@ import argparse
 import pyvirtualcam
 import lip_detector
 import servo_controller
-
-hand1 = False
-hand2 = False
+import imutils
 
 class people:
     id = 0
@@ -61,7 +59,7 @@ def argsfunc():
     args = vars(ap.parse_args())
     return args
 
-def choose_person(persons,person_tracked,hand_queue):
+def choose_person(persons,person_tracked,hand_queue,hand1,hand2):
     """
     Returns x value (face) of person that is talking
     """
@@ -82,7 +80,7 @@ def choose_person(persons,person_tracked,hand_queue):
                             hand_queue.clear()
                             hand1 = False
                             hand2 = False
-                            return "Error", person_tracked, hand_queue
+                            return "Error", person_tracked, hand_queue,hand1,hand2
 
     if person_tracked:
         person_tracked = False
@@ -92,27 +90,27 @@ def choose_person(persons,person_tracked,hand_queue):
                 person.active = True
                 if person in hand_queue:
                     hand_queue.remove(person)
-                return person.show_fx(), person_tracked, hand_queue
+                return person.show_fx(), person_tracked, hand_queue,hand1,hand2
         if not person_tracked:
             if len(hand_queue) != 0:
                 next_person = hand_queue[0]
                 hand_queue.pop(0)
                 person_tracked = True
-                return next_person.show_fx(), person_tracked, hand_queue
+                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2
     else:
         for person in persons:
             if person.is_talking():
                 person_tracked = True
                 if person in hand_queue:
                     hand_queue.remove(person)
-                return person.show_fx(), person_tracked, hand_queue
+                return person.show_fx(), person_tracked, hand_queue,hand1,hand2
         if len(hand_queue) != 0:
                 next_person = hand_queue[0]
                 hand_queue.pop(0)
                 person_tracked = True
-                return next_person.show_fx(), person_tracked, hand_queue
+                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2
     person_tracked = False
-    return None, person_tracked, hand_queue
+    return None, person_tracked, hand_queue,hand1,hand2
 
 def img_to_zoom(img):
     pass
@@ -136,10 +134,15 @@ def main(detectionCon = 0.8, maxHands = 4):
     detector_face = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(args["shape_predictor"])
     person_tracked = False
+
+    hand1 = False
+    hand2 = False
+
     persons = list()
     hand_queue = list()
     for k in range(25): # Initialization during first 25 frames
         success, img = cap.read()
+        img = imutils.resize(img, width=640,height=480)
         lip_detector.lipdetector(img,detector_face,predictor)
         facestatus = lip_detector.face_status()
     for person in facestatus:
@@ -156,6 +159,7 @@ def main(detectionCon = 0.8, maxHands = 4):
                 - Creating instruction for Arduino
             """
             success, img = cap.read() # initial image (clean)
+            img = imutils.resize(img, width=640,height=480)
             hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
             handstatus = sh.hand_status(detector, hands)
             for person in persons:
@@ -197,7 +201,7 @@ def main(detectionCon = 0.8, maxHands = 4):
                 #     old_fx = old_person.show_fx()
                 #     if abs(fx - old_fx) < 100:  # (1)
                 #         old_person.add_facedata(person[0],person[1],person[2])
-            instruction,person_tracked,hand_queue = choose_person(persons,person_tracked,hand_queue)
+            instruction,person_tracked,hand_queue,hand1,hand2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2)
             print(instruction)
             if instruction == None:
                 print("ERROR: Make a decision!")
