@@ -187,7 +187,7 @@ def main(detectionCon = 0.8, maxHands = 4):
                     if abs(fx - old_fx) < min_distance:
                         min_distance = abs(fx - old_fx)
                         min_person = old_person
-            min_person.add_facedata(person[1], person[2], person[0])
+            min_person.add_facedata(person[0], person[1], person[2])
             # for old_person in persons:
             #     old_fx = old_person.show_fx()
             #     if abs(fx - old_fx) < 100:  # (1)
