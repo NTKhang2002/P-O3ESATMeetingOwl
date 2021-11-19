@@ -4,6 +4,7 @@ import cv2
 from cvzone.HandTrackingModule import HandDetector
 import dlib
 import argparse
+import pyvirtualcam
 import lip_detector
 
 hand1 = False
@@ -143,62 +144,67 @@ def main(detectionCon = 0.8, maxHands = 4):
     for p in range(len(persons)):
         print(persons[p].show_data())
     print("Initialization complete")
-    while True:
-        """
-        Main loop: 
-            - Creating and showing image
-            - Updating 'person' objects with relevant data using the correct modules
-            - Creating instruction for Arduino
-        """
-        success, img = cap.read() # initial image (clean)
-        hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
-        handstatus = sh.hand_status(detector, hands)
-        for person in persons:
-            person.reset_hands()
-        for person in handstatus:
-            hx = person[1]
-            min_distance = None
-            min_person = None
-            for old_person in persons:
-                old_fx = old_person.show_fx()
-                if min_distance == None:
-                    min_distance = abs(hx - old_fx)
-                    min_person = old_person
-                else:
-                    if abs(hx-old_fx) < min_distance:
-                        min_distance = abs(hx-old_fx)
+    with pyvirtualcam.Camera(width=960, height=540, fps=30) as cam:
+        while True:
+            """
+            Main loop: 
+                - Creating and showing image
+                - Updating 'person' objects with relevant data using the correct modules
+                - Creating instruction for Arduino
+            """
+            success, img = cap.read() # initial image (clean)
+            hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
+            handstatus = sh.hand_status(detector, hands)
+            for person in persons:
+                person.reset_hands()
+            for person in handstatus:
+                hx = person[1]
+                min_distance = None
+                min_person = None
+                for old_person in persons:
+                    old_fx = old_person.show_fx()
+                    if min_distance == None:
+                        min_distance = abs(hx - old_fx)
                         min_person = old_person
-            min_person.add_handdata(person[1], person[2],person[0])
-                # if abs(hx - old_fx) < 100:  # New x value compared with old x value, if within predefined range -> data is updated (1)
-                #     old_person.add_handdata(person[1], person[2],person[0])
-        # input: image with hand visualization, output: image with hand visualization and lip visualization (2)
-        img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
-        facestatus = lip_detector.face_status()
-        for person in facestatus:
-            fx = person[0]
-            min_distance = None
-            min_person = None
-            for old_person in persons:
-                old_fx = old_person.show_fx()
-                if min_distance == None:
-                    min_distance = abs(fx - old_fx)
-                    min_person = old_person
-                else:
-                    if abs(fx - old_fx) < min_distance:
+                    else:
+                        if abs(hx-old_fx) < min_distance:
+                            min_distance = abs(hx-old_fx)
+                            min_person = old_person
+                min_person.add_handdata(person[1], person[2],person[0])
+                    # if abs(hx - old_fx) < 100:  # New x value compared with old x value, if within predefined range -> data is updated (1)
+                    #     old_person.add_handdata(person[1], person[2],person[0])
+            # input: image with hand visualization, output: image with hand visualization and lip visualization (2)
+            img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
+            facestatus = lip_detector.face_status()
+            for person in facestatus:
+                fx = person[0]
+                min_distance = None
+                min_person = None
+                for old_person in persons:
+                    old_fx = old_person.show_fx()
+                    if min_distance == None:
                         min_distance = abs(fx - old_fx)
                         min_person = old_person
-            min_person.add_facedata(person[0], person[1], person[2])
-            # for old_person in persons:
-            #     old_fx = old_person.show_fx()
-            #     if abs(fx - old_fx) < 100:  # (1)
-            #         old_person.add_facedata(person[0],person[1],person[2])
-        instruction,person_tracked,hand_queue = choose_person(persons,person_tracked,hand_queue)
-        print(instruction)
-        if instruction == None:
-            print("ERROR: Make a decision!")
-        cv2.imshow("image", img)
-        if cv2.waitKey(1) == ord('q'):
-            break
+                    else:
+                        if abs(fx - old_fx) < min_distance:
+                            min_distance = abs(fx - old_fx)
+                            min_person = old_person
+                min_person.add_facedata(person[0], person[1], person[2])
+                # for old_person in persons:
+                #     old_fx = old_person.show_fx()
+                #     if abs(fx - old_fx) < 100:  # (1)
+                #         old_person.add_facedata(person[0],person[1],person[2])
+            instruction,person_tracked,hand_queue = choose_person(persons,person_tracked,hand_queue)
+            print(instruction)
+            if instruction == None:
+                print("ERROR: Make a decision!")
+            cv2.imshow("image", img)
+            if cv2.waitKey(1) == ord('q'):
+                break
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.flip(img, 1)
+            cam.send(img)
+            cam.sleep_until_next_frame()
 if __name__ == '__main__':
     main()
 
