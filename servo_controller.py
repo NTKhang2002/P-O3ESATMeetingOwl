@@ -4,7 +4,7 @@ import math
 
 nodeMcu = serial.Serial("COM10", 9600) #Sartup
 straal=2
-max_aantal_pixels = 580
+max_aantal_pixels = 640
 helft_pixels = max_aantal_pixels/2
 
 def move(x):
