@@ -1,9 +1,13 @@
+import time
 import status_hand as sh
 import cv2
 from cvzone.HandTrackingModule import HandDetector
 import dlib
 import argparse
 import lip_detector
+
+hand1 = False
+hand2 = False
 
 class people:
     id = 0
@@ -22,6 +26,7 @@ class people:
         self.hx = hx
         self.hy = hy
         self.hs = hs
+        self.active = False
     def add_handdata(self,hx,hy,hs):
         self.hx = hx
         self.hy = hy
@@ -58,15 +63,29 @@ def choose_person(persons,person_tracked,hand_queue):
     """
     Returns x value (face) of person that is talking
     """
+    amount_talking = 0
     for person in persons:
         if person.hand_status() == 1:
             if person not in hand_queue:
                 hand_queue.append(person)
+                if not person_tracked:
+                    if hand1 == False:
+                        handtime1 = time.time()
+                        hand1 = True
+                    elif hand2 == False:
+                        handtime2 = time.time()
+                        hand2 = True
+                    if hand1 == hand2 == True:
+                        if handtime2 - handtime1 < 2:
+                            hand_queue.clear()
+                            return "Error", person_tracked, hand_queue
+
     if person_tracked:
         person_tracked = False
         for person in persons:
             if person.is_talking():
                 person_tracked = True
+                person.active = True
                 if person in hand_queue:
                     hand_queue.remove(person)
                 return person.show_fx(), person_tracked, hand_queue
@@ -150,7 +169,6 @@ def main(detectionCon = 0.8, maxHands = 4):
                         min_distance = abs(hx-old_fx)
                         min_person = old_person
             min_person.add_handdata(person[1], person[2],person[0])
-
                 # if abs(hx - old_fx) < 100:  # New x value compared with old x value, if within predefined range -> data is updated (1)
                 #     old_person.add_handdata(person[1], person[2],person[0])
         # input: image with hand visualization, output: image with hand visualization and lip visualization (2)
@@ -176,6 +194,8 @@ def main(detectionCon = 0.8, maxHands = 4):
             #         old_person.add_facedata(person[0],person[1],person[2])
         instruction,person_tracked,hand_queue = choose_person(persons,person_tracked,hand_queue)
         print(instruction)
+        if instruction == None:
+            print("ERROR: Make a decision!")
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
