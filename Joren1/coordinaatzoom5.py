@@ -7,8 +7,7 @@ MIDDLEPOINTY = int(HEIGHT/2)
 tijd = 15
 interpolatielijst = [0]*tijd
 # 1/2 for full screen[|---------------------|] , 1/4 to use only the middle part [-----|----------|-----]
-Central_bounding = int(1/2 * WIDTH)
-
+Central_bounding = int(1/4 * WIDTH)
 
 # creating a variable with the classifiers
 CLASSIFIERS = "haarcascade_frontalface_default.xml"
@@ -82,9 +81,9 @@ while True:
     faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    #bounding box that represents the part of the image it tracks faces in.
     cv2.rectangle(img, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
     face = mostcentralface(WIDTH,faces)
-    print(face)
 
 
     if face is not False:
