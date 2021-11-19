@@ -90,6 +90,11 @@ def choose_person(persons,person_tracked,hand_queue):
                 return next_person.show_fx(), person_tracked, hand_queue
     person_tracked = False
     return None, person_tracked, hand_queue
+
+def img_to_zoom(img):
+    pass
+
+
 def main(detectionCon = 0.8, maxHands = 4):
     """
     Main pipeline: calls and implements all modules
