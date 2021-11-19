@@ -1,12 +1,12 @@
 import cv2
 
-HEIGHT = 720
+HEIGHT = 480
 WIDTH = int(16 / 9 * HEIGHT)
 MIDDLEPOINTX = int(WIDTH/2)
 MIDDLEPOINTY = int(HEIGHT/2)
-face = 0
-tijd = 10
+tijd = 15
 interpolatielijst = [0]*tijd
+Central_bounding = int(MIDDLEPOINTX/1.4)
 
 
 # creating a variable with the classifiers
@@ -21,11 +21,11 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
 
 # sets the variables xmin, xmax etc. to the standard value of the image.
-
+Xf, Yf, Wf, Hf = MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY
 xmin, xmax, ymin, ymax = 0, WIDTH, 0, HEIGHT
 
 
-def zoomboundaries(img, X, Y, W, H):
+def zoomboundaries(img , X, Y, W, H):
     Ry = img.shape[0]
     Rx = img.shape[1]
     V = Rx / Ry
@@ -39,38 +39,21 @@ def zoomboundaries(img, X, Y, W, H):
     xmax = max(min(int(xfc + V * H), Rx), int(V * 2 * H))
     return xmin, xmax, ymin, ymax
 
-
 def crop(img, xmin, xmax, ymin, ymax):
     imgcropped = img[ymin:ymax, xmin:xmax]
     return imgcropped
-
 
 def resizer(img, Width, Height):
     imgresized = cv2.resize(img, (Width, Height))
     return imgresized
 
-
 def coordinaatgezicht(faces, face):
-    if faces != () and len(faces) >= face + 1:
-        X = faces[face][0]
-        Y = faces[face][1]
-        W = faces[face][2]
-        H = faces[face][3]
+    X = faces[face][0]
+    Y = faces[face][1]
+    W = faces[face][2]
+    H = faces[face][3]
 
-        return X, Y, W, H
-    return MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY
-
-
-def interpolatiepad(prevcord, nextcord, tijd):
-    X1, Y1, W1, H1 = prevcord[0], prevcord[1], prevcord[2], prevcord[3]
-    X2, Y2, W2, H2 = nextcord[0], nextcord[1], nextcord[2], nextcord[3]
-    k = tijd
-    interpolatielijst = list()
-    for i in range(tijd):
-        i += 1
-        interpolatielijst.append([int((k - i) / tijd * X1 + i / tijd * X2), int((k - i) / tijd * Y1 + i / tijd * Y2),
-                                  int((k - i) / tijd * W1 + i / tijd * W2), int((k - i) / tijd * H1 + i / tijd * H2)])
-    return interpolatielijst
+    return X, Y, W, H
 
 def gemiddeldelijst(lijst, positie):
     som = 0
@@ -79,6 +62,16 @@ def gemiddeldelijst(lijst, positie):
         som += lijst[i][positie]
     return int(som/n)
 
+def mostcentralface(width,faces):
+    if faces != ():
+        centerpoint = int(width/2)
+        xlijst = list()
+        for face in range(len(faces)):
+            xlijst.append(int(abs(centerpoint - faces[face][0])))
+        minx = min(xlijst)
+        if minx <= Central_bounding:
+            return xlijst.index(minx)
+    return 0
 
 i = 0
 while True:
@@ -88,10 +81,14 @@ while True:
     faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    cv2.rectangle(img, (Central_bounding,0),(WIDTH-Central_bounding,HEIGHT),(255,255,255),2)
+    face = mostcentralface(WIDTH,faces)
 
-    Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
-    interpolatielijst[i % tijd] = [Xf,Yf,Wf,Hf]
-    print(interpolatielijst)
+    if faces != () and len(faces) >= face + 1:
+        Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
+
+    interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
+
 
     if i > tijd:
         Xf = gemiddeldelijst(interpolatielijst,0)
@@ -99,7 +96,7 @@ while True:
         Wf = gemiddeldelijst(interpolatielijst,2)
         Hf = gemiddeldelijst(interpolatielijst,3)
 
-    if faces != () and len(faces) >= face + 1 and Xf != None:
+    if faces != () and len(faces) >= face + 1:
         (xmin, xmax, ymin, ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf)
 
     imgcropped = crop(img, xmin, xmax, ymin, ymax)
