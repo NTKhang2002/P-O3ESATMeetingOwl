@@ -1,6 +1,6 @@
 import serial
 import time
-nodeMcu = serial.Serial("COM10", 9600) #Sartup
+nodeMcu = serial.Serial("COM10", 9600) #Sartup en kijk goed na welke poort
 
 def move(angle):
     nodeMcu.write(str(angle).encode())

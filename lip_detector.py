@@ -86,10 +86,8 @@ def localiser(participant, x):
 
 def check(participant,tijd_algemeen,frame):
     if participant.present:
-        if participant.talking:
-            cv2.putText(frame, participant.name + ": TALKING", (participant.fx, participant.fy),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2) #TEKST BOVEN HOOFD
-        else:
-            cv2.putText(frame, participant.name, (participant.fx, participant.fy), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)  # TEKST BOVEN HOOFD
+
+        cv2.putText(frame, participant.name + " ("+ str(participant.fx) +", " + str(participant.fy) + ")", (participant.fx, participant.fy), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)  # TEKST BOVEN HOOFD
         if(tijd_algemeen - participant.tijd) > 5:
             participant.reset()
 
