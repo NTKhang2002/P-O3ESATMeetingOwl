@@ -16,7 +16,7 @@ CLASSIFIERS = "haarcascade_frontalface_default.xml"
 # Create cascade
 FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
 # Capture from camera, 0 because webcam
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
@@ -64,7 +64,7 @@ def gemiddeldelijst(lijst, positie):
     return int(som/n)
 
 def mostcentralface(width,faces):
-    if faces != ():
+    if len(faces) != 0:
         centerpoint = int(width/2)
         xlijst = list()
         for face in range(len(faces)):
@@ -80,6 +80,7 @@ while True:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Detect the faces
     faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
+
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
     #bounding box that represents the part of the image it tracks faces in.
@@ -88,7 +89,7 @@ while True:
 
 
     if face is not False:
-        if faces != () and len(faces) >= face + 1:
+        if len(faces) != 0 and len(faces) >= face + 1:
             Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
 
     interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
@@ -100,7 +101,7 @@ while True:
             Wf = gemiddeldelijst(interpolatielijst,2)
             Hf = gemiddeldelijst(interpolatielijst,3)
 
-        if faces != () and len(faces) >= face + 1:
+        if len(faces) != 0 and len(faces) >= face + 1:
             (xmin, xmax, ymin, ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf,schaal)
 
     imgcropped = crop(img, xmin, xmax, ymin, ymax)
