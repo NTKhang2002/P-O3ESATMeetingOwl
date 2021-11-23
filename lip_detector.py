@@ -36,7 +36,7 @@ class player:
         self.teller_open = 0
         self.open = [10, 0, 0, 0, 0]
     def return_tuple(self):
-        return (self.fx,self.fy,self.talking)
+        return (self.fx,self.fy,self.talking,self.name)
     def reset(self):
         self.fx = -1000
         self.fy = -1000
