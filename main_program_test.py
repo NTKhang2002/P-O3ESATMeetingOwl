@@ -8,7 +8,7 @@ import argparse
 import lip_detector
 # import servo_controller
 import imutils
-import zoom_test
+# import zoom_test
 from threading import Thread
 
 class people:
@@ -44,7 +44,7 @@ class people:
     def show_hx(self):
         return self.hx
     def show_data(self):
-        return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs
+        return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs, self.name
     def is_talking(self):
         return self.t
     def hand_status(self):
@@ -53,6 +53,8 @@ class people:
         self.hx = None
         self.hy = None
         self.hs = None
+    def show_name(self):
+        return self.name
 def argsfunc():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
@@ -63,7 +65,8 @@ def argsfunc():
     args = vars(ap.parse_args())
     return args
 
-def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2):
+# def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2):
+def choose_person(persons,hand_queue):
     """
     Returns x value (face) of person that is talking
     """
@@ -71,55 +74,57 @@ def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handti
         if person.hand_status() == 1:
             if person not in hand_queue:
                 hand_queue.append(person)
-                if not person_tracked:
-                    if hand1 == False:
-                        handtime1 = time.time()
-                        hand1 = True
-                    elif hand2 == False:
-                        handtime2 = time.time()
-                        hand2 = True
-                    if hand1 == hand2 == True:
-                        if handtime2 - handtime1 < 2:
-                            hand_queue.clear()
-                            hand1 = False
-                            hand2 = False
-                            return "Error", person_tracked, hand_queue,hand1,hand2
+                print("hand added")
+    return hand_queue
+#             if not person_tracked:
+#                 if hand1 == False:
+#                     handtime1 = time.time()
+#                     hand1 = True
+#                 elif hand2 == False:
+#                     handtime2 = time.time()
+#                     hand2 = True
+#                 if hand1 == hand2 == True:
+#                     if handtime2 - handtime1 < 2:
+#                         hand_queue.clear()
+#                         hand1 = False
+#                         hand2 = False
+#                         return "Error", person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    #
+    # if person_tracked:
+    #     person_tracked = False
+    #     for person in persons:
+    #         if person.is_talking():
+    #             person_tracked = True
+    #             person.active = True
+    #             if person in hand_queue:
+    #                 hand_queue.remove(person)
+    #             return person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    #     if not person_tracked:
+    #         if len(hand_queue) != 0:
+    #             next_person = hand_queue[0]
+    #             hand_queue.pop(0)
+    #             person_tracked = True
+    #             return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    # else:
+    #     for person in persons:
+    #         if person.is_talking():
+    #             person_tracked = True
+    #             if person in hand_queue:
+    #                 hand_queue.remove(person)
+    #             return person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    #     if len(hand_queue) != 0:
+    #             next_person = hand_queue[0]
+    #             hand_queue.pop(0)
+    #             person_tracked = True
+    #             return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    # person_tracked = False
+    # return None, person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+#
+# def zoom():
+#     zoom_test()
 
-    if person_tracked:
-        person_tracked = False
-        for person in persons:
-            if person.is_talking():
-                person_tracked = True
-                person.active = True
-                if person in hand_queue:
-                    hand_queue.remove(person)
-                return person.show_fx(), person_tracked, hand_queue,hand1,hand2
-        if not person_tracked:
-            if len(hand_queue) != 0:
-                next_person = hand_queue[0]
-                hand_queue.pop(0)
-                person_tracked = True
-                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2
-    else:
-        for person in persons:
-            if person.is_talking():
-                person_tracked = True
-                if person in hand_queue:
-                    hand_queue.remove(person)
-                return person.show_fx(), person_tracked, hand_queue,hand1,hand2
-        if len(hand_queue) != 0:
-                next_person = hand_queue[0]
-                hand_queue.pop(0)
-                person_tracked = True
-                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2
-    person_tracked = False
-    return None, person_tracked, hand_queue,hand1,hand2
 
-def zoom():
-    zoom_test()
-
-
-def pipeline(detectionCon = 0.8, maxHands = 4):
+def main(detectionCon = 0.8, maxHands = 4):
     """
     Main pipeline: calls and implements all modules
     """
@@ -198,17 +203,19 @@ def pipeline(detectionCon = 0.8, maxHands = 4):
                         min_distance = abs(fx - old_fx)
                         min_person = old_person
             min_person.add_facedata(person[0], person[1], person[2],person[3])
-        instruction,person_tracked,hand_queue,hand1,hand2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2)
+        # instruction,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2)
+        hand_queue = choose_person(persons,hand_queue)
+        if hand_queue != None:
+            print(len(hand_queue))
+            for person in hand_queue:   # hand queue tonen op het scherm (naam van persoon via person.name)
+                print(person.show_name())
+                cv2.putText(img, person.name + " (" + str(person.hx) + ", " + str(person.hy) + ")",
+                          (person.hx, person.hy), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)  # TEKST BOVEN HAND
 
-
-        for person in hand_queue:   # hand queue tonen op het scherm (naam van persoon via person.name)
-            pass
-
-
-        print(instruction)
-        if instruction == "Error":
-            print("ERROR: Make a decision!")
-        # servo_controller.move(instruction)
+        # print(instruction)
+        # if instruction == "Error":
+        #     print("ERROR: Make a decision!")
+        # x_oud = servo_controller.move(instruction,x_oud)
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
@@ -217,10 +224,10 @@ def pipeline(detectionCon = 0.8, maxHands = 4):
         # cam.send(img)
         # cam.sleep_until_next_frame()
 if __name__ == '__main__':
-    t1 = Thread(target = pipeline)
-    t2 = Thread(target = zoom)
-
-    t1.start()
-    t2.start()
-
+    # t1 = Thread(target = pipeline)
+    # t2 = Thread(target = zoom)
+    #
+    # t1.start()
+    # t2.start()
+    main()
 

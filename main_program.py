@@ -112,9 +112,6 @@ def choose_person(persons,person_tracked,hand_queue,hand1,hand2):
     person_tracked = False
     return None, person_tracked, hand_queue,hand1,hand2
 
-def img_to_zoom(img):
-    pass
-
 
 def main(detectionCon = 0.8, maxHands = 4):
     """
@@ -196,9 +193,10 @@ def main(detectionCon = 0.8, maxHands = 4):
                 min_person.add_facedata(person[0], person[1], person[2])
             instruction,person_tracked,hand_queue,hand1,hand2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2)
             print(instruction)
-            if instruction == None:
+            if instruction == "Error":
                 print("ERROR: Make a decision!")
-            servo_controller.move(instruction)
+            else:
+                servo_controller.move(instruction)
             cv2.imshow("image", img)
             if cv2.waitKey(1) == ord('q'):
                 break
