@@ -66,7 +66,7 @@ def coordinaatzoomfunctie():
     # Create cascade
     FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
     # Capture from camera, 0 because webcam
-    capzoom = cv2.VideoCapture(0)
+    capzoom = cv2.VideoCapture(1)
     capzoom.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     capzoom.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     capzoom.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
@@ -120,4 +120,4 @@ def coordinaatzoomfunctie():
 
     capzoom.release()
 
-coordinaatzoomfunctie()
+
