@@ -1,7 +1,7 @@
 import cv2
 
 #print("Before URL")
-cap = cv2.VideoCapture('rtsp://admin:123456@192.168.1.216/H264?ch=1&subtype=0')
+cap = cv2.VideoCapture('rtsp://admin:123456@169.254.242.107/H264?ch=1&subtype=0')
 #print("After URL")
 
 while True:

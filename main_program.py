@@ -1,12 +1,13 @@
-from time import sleep
+import time
 import status_hand as sh
 import cv2
 from cvzone.HandTrackingModule import HandDetector
-import face_test
-import detect_open_mouth_test
 import dlib
 import argparse
+import pyvirtualcam
 import lip_detector
+import servo_controller
+import imutils
 
 class people:
     id = 0
@@ -25,6 +26,7 @@ class people:
         self.hx = hx
         self.hy = hy
         self.hs = hs
+        self.active = False
     def add_handdata(self,hx,hy,hs):
         self.hx = hx
         self.hy = hy
@@ -39,7 +41,14 @@ class people:
         return self.hx
     def show_data(self):
         return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs
-
+    def is_talking(self):
+        return self.t
+    def hand_status(self):
+        return self.hs
+    def reset_hands(self):
+        self.hx = None
+        self.hy = None
+        self.hs = None
 def argsfunc():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
@@ -50,8 +59,70 @@ def argsfunc():
     args = vars(ap.parse_args())
     return args
 
+def choose_person(persons,person_tracked,hand_queue,hand1,hand2):
+    """
+    Returns x value (face) of person that is talking
+    """
+    amount_talking = 0
+    for person in persons:
+        if person.hand_status() == 1:
+            if person not in hand_queue:
+                hand_queue.append(person)
+                if not person_tracked:
+                    if hand1 == False:
+                        handtime1 = time.time()
+                        hand1 = True
+                    elif hand2 == False:
+                        handtime2 = time.time()
+                        hand2 = True
+                    if hand1 == hand2 == True:
+                        if handtime2 - handtime1 < 2:
+                            hand_queue.clear()
+                            hand1 = False
+                            hand2 = False
+                            return "Error", person_tracked, hand_queue,hand1,hand2
+
+    if person_tracked:
+        person_tracked = False
+        for person in persons:
+            if person.is_talking():
+                person_tracked = True
+                person.active = True
+                if person in hand_queue:
+                    hand_queue.remove(person)
+                return person.show_fx(), person_tracked, hand_queue,hand1,hand2
+        if not person_tracked:
+            if len(hand_queue) != 0:
+                next_person = hand_queue[0]
+                hand_queue.pop(0)
+                person_tracked = True
+                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2
+    else:
+        for person in persons:
+            if person.is_talking():
+                person_tracked = True
+                if person in hand_queue:
+                    hand_queue.remove(person)
+                return person.show_fx(), person_tracked, hand_queue,hand1,hand2
+        if len(hand_queue) != 0:
+                next_person = hand_queue[0]
+                hand_queue.pop(0)
+                person_tracked = True
+                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2
+    person_tracked = False
+    return None, person_tracked, hand_queue,hand1,hand2
+
+
 def main(detectionCon = 0.8, maxHands = 4):
+    """
+    Main pipeline: calls and implements all modules
+    """
     print("Initializing...")
+    """
+    Initialization phase: 
+        - Initializing video capture, hand detector, argument parser, face detector and shape predictor
+        - Creating initial 'person' objects
+    """
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     cap.set(3, 1000)
     cap.set(4, 100)
@@ -59,38 +130,80 @@ def main(detectionCon = 0.8, maxHands = 4):
     args = argsfunc()
     detector_face = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(args["shape_predictor"])
-    for k in range(25):
+    person_tracked = False
+
+    hand1 = False
+    hand2 = False
+
+    persons = list()
+    hand_queue = list()
+    for k in range(25): # Initialization during first 25 frames
         success, img = cap.read()
+        img = imutils.resize(img, width=640,height=480)
         lip_detector.lipdetector(img,detector_face,predictor)
         facestatus = lip_detector.face_status()
-    persons = list()
     for person in facestatus:
         persons.append(people(person[0],person[1],person[2],None,None,None))
     for p in range(len(persons)):
         print(persons[p].show_data())
     print("Initialization complete")
-    while True:
-        success, img = cap.read()
-        hands, img = detector.findHands(img)
-        handstatus = sh.hand_status(detector, hands)
-        for person in handstatus:
-            hx = person[1]
-            for old_person in persons:
-                old_fx = old_person.show_fx()
-                if abs(hx - old_fx) < 100:
-                    old_person.add_handdata(person[1], person[2],person[0])
-        #print(persons[0].show_data())
-        img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
-        facestatus = lip_detector.face_status()
-        for person in facestatus:
-            fx = person[0]
-            for old_person in persons:
-                old_fx = old_person.show_fx()
-                if abs(fx - old_fx) < 100:
-                    old_person.add_facedata(person[0],person[1],person[2])
-        cv2.imshow("image", img)
-        if cv2.waitKey(1) == ord('q'):
-            break
+    with pyvirtualcam.Camera(width=640, height=480, fps=30) as cam:
+        while True:
+            """
+            Main loop: 
+                - Creating and showing image
+                - Updating 'person' objects with relevant data using the correct modules
+                - Creating instruction for Arduino
+            """
+            success, img = cap.read() # initial image (clean)
+            img = imutils.resize(img, width=640,height=480)
+            hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
+            handstatus = sh.hand_status(detector, hands)
+            for person in persons:
+                person.reset_hands()
+            for person in handstatus:
+                hx = person[1]
+                min_distance = None
+                min_person = None
+                for old_person in persons:
+                    old_fx = old_person.show_fx()
+                    if min_distance == None:
+                        min_distance = abs(hx - old_fx)
+                        min_person = old_person
+                    else:
+                        if abs(hx-old_fx) < min_distance:
+                            min_distance = abs(hx-old_fx)
+                            min_person = old_person
+                min_person.add_handdata(person[1], person[2],person[0])
+            img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
+            facestatus = lip_detector.face_status()
+            for person in facestatus:
+                fx = person[0]
+                min_distance = None
+                min_person = None
+                for old_person in persons:
+                    old_fx = old_person.show_fx()
+                    if min_distance == None:
+                        min_distance = abs(fx - old_fx)
+                        min_person = old_person
+                    else:
+                        if abs(fx - old_fx) < min_distance:
+                            min_distance = abs(fx - old_fx)
+                            min_person = old_person
+                min_person.add_facedata(person[0], person[1], person[2])
+            instruction,person_tracked,hand_queue,hand1,hand2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2)
+            print(instruction)
+            if instruction == "Error":
+                print("ERROR: Make a decision!")
+            else:
+                servo_controller.move(instruction)
+            cv2.imshow("image", img)
+            if cv2.waitKey(1) == ord('q'):
+                break
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.flip(img, 1)
+            cam.send(img)
+            cam.sleep_until_next_frame()
 if __name__ == '__main__':
     main()
 
