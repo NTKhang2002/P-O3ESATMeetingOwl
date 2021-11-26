@@ -1,6 +1,5 @@
 import cv2
 
-
 def zoomboundaries(img , X, Y, W, H, Scalar):
     Ry = img.shape[0]
     Rx = img.shape[1]
@@ -49,7 +48,7 @@ def mostcentralface(width,faces,Central_bounding):
             return xlijst.index(minx)
     return False
 
-def main():
+def coordinaatzoomfunctie():
     HEIGHT = 480
     WIDTH = int(16 / 9 * HEIGHT)
     MIDDLEPOINTX = int(WIDTH / 2)
@@ -67,7 +66,7 @@ def main():
     # Create cascade
     FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
     # Capture from camera, 0 because webcam
-    capzoom = cv2.VideoCapture(0)
+    capzoom = cv2.VideoCapture(1)
     capzoom.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     capzoom.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     capzoom.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
@@ -120,7 +119,3 @@ def main():
         i += 1
 
     capzoom.release()
-
-
-if __name__ == '__main__':
-    main()
