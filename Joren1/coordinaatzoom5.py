@@ -1,12 +1,13 @@
 import cv2
 
-HEIGHT = 720
+HEIGHT = 480
 WIDTH = int(16 / 9 * HEIGHT)
 MIDDLEPOINTX = int(WIDTH/2)
 MIDDLEPOINTY = int(HEIGHT/2)
-tijd = 15
+tijd = 10
 schaal = 1.3
-interpolatielijst = [0]*tijd
+interpolatielijst = [[MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY]]*tijd
+
 # 1/2 for full screen[|---------------------|] , 1/4 to use only the middle part [-----|----------|-----]
 Central_bounding = int(1/2 * WIDTH)
 
@@ -64,7 +65,7 @@ def gemiddeldelijst(lijst, positie):
     return int(som/n)
 
 def mostcentralface(width,faces):
-    if len(faces) != 0:
+    if len(faces) != 0 :
         centerpoint = int(width/2)
         xlijst = list()
         for face in range(len(faces)):
@@ -74,13 +75,14 @@ def mostcentralface(width,faces):
             return xlijst.index(minx)
     return False
 
+
+
 i = 0
 while True:
     status, img = cap.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Detect the faces
     faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
-
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
     #bounding box that represents the part of the image it tracks faces in.
@@ -89,19 +91,18 @@ while True:
 
 
     if face is not False:
-        if len(faces) != 0 and len(faces) >= face + 1:
+        if len(faces) != 0  and len(faces) >= face + 1:
             Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
 
     interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
 
     if face is not False:
-        if i > tijd:
-            Xf = gemiddeldelijst(interpolatielijst,0)
-            Yf = gemiddeldelijst(interpolatielijst,1)
-            Wf = gemiddeldelijst(interpolatielijst,2)
-            Hf = gemiddeldelijst(interpolatielijst,3)
+        Xf = gemiddeldelijst(interpolatielijst,0)
+        Yf = gemiddeldelijst(interpolatielijst,1)
+        Wf = gemiddeldelijst(interpolatielijst,2)
+        Hf = gemiddeldelijst(interpolatielijst,3)
 
-        if len(faces) != 0 and len(faces) >= face + 1:
+        if len(faces) != 0  and len(faces) >= face + 1:
             (xmin, xmax, ymin, ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf,schaal)
 
     imgcropped = crop(img, xmin, xmax, ymin, ymax)

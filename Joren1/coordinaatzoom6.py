@@ -1,35 +1,7 @@
 import cv2
 
-HEIGHT = 480
-WIDTH = int(16 / 9 * HEIGHT)
-MIDDLEPOINTX = int(WIDTH/2)
-MIDDLEPOINTY = int(HEIGHT/2)
-tijd = 15
-schaal = 1.3
-interpolatielijst = [[MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY]]*tijd
-#TODO: maak in plaats van een lijst van nullen, lijst van beginwaarden van de frame [middelpointX,MiddelpointY, ..., ...]
-# --> elimineert setup fase en zo kan alles in functie.
 
-# 1/2 for full screen[|---------------------|] , 1/4 to use only the middle part [-----|----------|-----]
-Central_bounding = int(1/2 * WIDTH)
-
-# creating a variable with the classifiers
-CLASSIFIERS = "haarcascade_frontalface_default.xml"
-
-# Create cascade
-FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
-# Capture from camera, 0 because webcam
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-
-# sets the variables xmin, xmax etc. to the standard value of the image.
-Xf, Yf, Wf, Hf = MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY
-xmin, xmax, ymin, ymax = 0, WIDTH, 0, HEIGHT
-
-
-def zoomboundaries(img , X, Y, W, H,Scalar):
+def zoomboundaries(img , X, Y, W, H, Scalar):
     Ry = img.shape[0]
     Rx = img.shape[1]
     V = Rx / Ry
@@ -66,7 +38,7 @@ def gemiddeldelijst(lijst, positie):
         som += lijst[i][positie]
     return int(som/n)
 
-def mostcentralface(width,faces):
+def mostcentralface(width,faces,Central_bounding):
     if len(faces) != 0 :
         centerpoint = int(width/2)
         xlijst = list()
@@ -77,48 +49,78 @@ def mostcentralface(width,faces):
             return xlijst.index(minx)
     return False
 
-i = 0
-while True:
-    status, img = cap.read()
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # Detect the faces
-    faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
-    for (x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-    #bounding box that represents the part of the image it tracks faces in.
-    cv2.rectangle(img, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
-    face = mostcentralface(WIDTH,faces)
+def main():
+    HEIGHT = 480
+    WIDTH = int(16 / 9 * HEIGHT)
+    MIDDLEPOINTX = int(WIDTH / 2)
+    MIDDLEPOINTY = int(HEIGHT / 2)
+    tijd = 15
+    schaal = 1.0
+    interpolatielijst = [[MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY]] * tijd
+
+    # 1/2 for full screen[|---------------------|] , 1/4 to use only the middle part [-----|----------|-----]
+    Central_bounding = int(1 / 2 * WIDTH)
+
+    # creating a variable with the classifiers
+    CLASSIFIERS = "haarcascade_frontalface_default.xml"
+
+    # Create cascade
+    FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
+    # Capture from camera, 0 because webcam
+    capzoom = cv2.VideoCapture(0)
+    capzoom.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    capzoom.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+    capzoom.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+
+    # sets the variables xmin, xmax etc. to the standard value of the image.
+    Xf, Yf, Wf, Hf = MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY
+    xmin, xmax, ymin, ymax = 0, WIDTH, 0, HEIGHT
+    i = 0
+    while True:
+        status, imgzoom = capzoom.read()
+        gray = cv2.cvtColor(imgzoom, cv2.COLOR_BGR2GRAY)
+        # Detect the faces
+        faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
+        for (x, y, w, h) in faces:
+            cv2.rectangle(imgzoom, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        #bounding box that represents the part of the image it tracks faces in.
+        cv2.rectangle(imgzoom, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
+        face = mostcentralface(WIDTH,faces,Central_bounding)
 
 
-    if face is not False:
-        if len(faces) != 0  and len(faces) >= face + 1:
-            Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
+        if face is not False:
+            if len(faces) != 0  and len(faces) >= face + 1:
+                Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
 
-    interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
+        interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
 
-    if face is not False:
-        Xf = gemiddeldelijst(interpolatielijst,0)
-        Yf = gemiddeldelijst(interpolatielijst,1)
-        Wf = gemiddeldelijst(interpolatielijst,2)
-        Hf = gemiddeldelijst(interpolatielijst,3)
+        if face is not False:
+            Xf = gemiddeldelijst(interpolatielijst,0)
+            Yf = gemiddeldelijst(interpolatielijst,1)
+            Wf = gemiddeldelijst(interpolatielijst,2)
+            Hf = gemiddeldelijst(interpolatielijst,3)
 
-        if len(faces) != 0  and len(faces) >= face + 1:
-            (xmin, xmax, ymin, ymax) = zoomboundaries(img, Xf, Yf, Wf, Hf,schaal)
+            if len(faces) != 0  and len(faces) >= face + 1:
+                (xmin, xmax, ymin, ymax) = zoomboundaries(imgzoom, Xf, Yf, Wf, Hf,schaal)
 
-    imgcropped = crop(img, xmin, xmax, ymin, ymax)
-    imgresized = resizer(imgcropped, WIDTH, HEIGHT)
+        imgcropped = crop(imgzoom, xmin, xmax, ymin, ymax)
+        imgresized = resizer(imgcropped, WIDTH, HEIGHT)
 
-    cv2.imshow("zoomed", imgresized)
-    cv2.imshow("origineel", img)
-    toets = cv2.waitKey(10)
-    if toets == 32:
-        xmin = 0
-        xmax = WIDTH
-        ymin = 0
-        ymax = HEIGHT
+        cv2.imshow("zoomed", imgresized)
+        cv2.imshow("origineel", imgzoom)
+        toets = cv2.waitKey(10)
+        if toets == 32:
+            xmin = 0
+            xmax = WIDTH
+            ymin = 0
+            ymax = HEIGHT
 
-    if toets == 27:
-        break
-    i += 1
+        if toets == 27:
+            break
+        i += 1
 
-cap.release()
+    capzoom.release()
+
+
+if __name__ == '__main__':
+    main()
