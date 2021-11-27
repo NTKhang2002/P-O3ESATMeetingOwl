@@ -47,13 +47,13 @@ class player:
         self.open = [10, 0, 0, 0, 0]
 
 participant_1 = player(-1000,-1000)
-participant_1.name = "Ben Dover"
+participant_1.name = "Ben" #Dover
 participant_2 = player(-1000,-1000)
-participant_2.name = "Barry McKockiner"
+participant_2.name = "Barry" #McKockiner
 participant_3 = player(-1000,-1000)
-participant_3.name = "Hugh G. Rection"
+participant_3.name = "Hugh" #G. Rection
 participant_4 = player(-1000,-1000)
-participant_4.name = "Rae Piste"
+participant_4.name = "Rae" #Piste
 participant_list = [participant_1, participant_2, participant_3, participant_4]
 
 def update(participant, x, y,mond_algemeen):
