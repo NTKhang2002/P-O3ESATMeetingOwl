@@ -15,9 +15,10 @@ def hand_status(detector, hands):
                 hand_status = -1
             elif fingers == [1,1,1,1,1] or fingers == [0,1,1,1,1]:
                 hand_status = 1
+                print(1)
             else:
-                hand_status = 0
 
+                hand_status = 0
             result = (hand_status, cx, cy)
             yield result
 
