@@ -20,7 +20,8 @@ class people:
         """
         people.id += 1
         self.id = people.id
-        self.fx = [fx]
+        # self.fx = [fx]
+        self.fx = fx
         self.fy = fy
         self.t = t
         self.hx = hx
@@ -33,16 +34,18 @@ class people:
         self.hy = hy
         self.hs = hs
     def add_facedata(self,fx,fy,t,name):
-        if len(self.fx) < 10:
-            self.fx.append(fx)
-        else:
-            self.fx.pop(0)
-            self.fx.append(fx)
+        # if len(self.fx) < 10:
+        #     self.fx.append(fx)
+        # else:
+        #     self.fx.pop(0)
+        #     self.fx.append(fx)
+        self.fx = fx
         self.fy = fy
         self.t = t
         self.name = name
     def show_fx(self):
-        return sum(self.fx)/len(self.fx)
+        # return sum(self.fx)/len(self.fx)
+        return self.fx
     def show_hx(self):
         return self.hx
     def show_data(self):
@@ -112,52 +115,55 @@ def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handti
     Returns x value (face) of person that is talking
     """
     for person in persons:
-        if person.hand_status() == 1:
-            if person not in hand_queue:
-                hand_queue.append(person)
-                print("hand added")
-                if hand1 == False:
-                    handtime1 = time.time()
-                    hand1 = True
-                elif hand2 == False:
-                    handtime2 = time.time()
-                    hand2 = True
-                if hand1 == hand2 == True:
-                    if handtime2 - handtime1 < 2:
-                        hand_queue.clear()
-                        hand1 = False
-                        hand2 = False
-                        return "Error", person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
-
-    if person_tracked:
-        person_tracked = False
-        for person in persons:
-            if person.is_talking():
-                person_tracked = True
-                person.active = True
-                if person in hand_queue:
-                    hand_queue.remove(person)
-                return person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
-        if not person_tracked:
-            if len(hand_queue) != 0:
-                next_person = hand_queue[0]
-                hand_queue.pop(0)
-                person_tracked = True
-                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
-    else:
-        for person in persons:
-            if person.is_talking():
-                person_tracked = True
-                if person in hand_queue:
-                    hand_queue.remove(person)
-                return person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
-        if len(hand_queue) != 0:
-                next_person = hand_queue[0]
-                hand_queue.pop(0)
-                person_tracked = True
-                return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
-    person_tracked = False
-    return None, person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+        if person.is_talking():
+            return person.show_fx()
+    # for person in persons:
+    #     if person.hand_status() == 1:
+    #         if person not in hand_queue:
+    #             hand_queue.append(person)
+    #             print("hand added")
+    #             if hand1 == False:
+    #                 handtime1 = time.time()
+    #                 hand1 = True
+    #             elif hand2 == False:
+    #                 handtime2 = time.time()
+    #                 hand2 = True
+    #             if hand1 == hand2 == True:
+    #                 if handtime2 - handtime1 < 2:
+    #                     hand_queue.clear()
+    #                     hand1 = False
+    #                     hand2 = False
+    #                     return "Error", person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    #
+    # if person_tracked:
+    #     person_tracked = False
+    #     for person in persons:
+    #         if person.is_talking():
+    #             person_tracked = True
+    #             person.active = True
+    #             if person in hand_queue:
+    #                 hand_queue.remove(person)
+    #             return person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    #     if not person_tracked:
+    #         if len(hand_queue) != 0:
+    #             next_person = hand_queue[0]
+    #             hand_queue.pop(0)
+    #             person_tracked = True
+    #             return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    # else:
+    #     for person in persons:
+    #         if person.is_talking():
+    #             person_tracked = True
+    #             if person in hand_queue:
+    #                 hand_queue.remove(person)
+    #             return person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    #     if len(hand_queue) != 0:
+    #             next_person = hand_queue[0]
+    #             hand_queue.pop(0)
+    #             person_tracked = True
+    #             return next_person.show_fx(), person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
+    # person_tracked = False
+    # return None, person_tracked, hand_queue,hand1,hand2,handtime1,handtime2
 
 
 
@@ -226,7 +232,8 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
         for person in facestatus:
             min_face(person,persons)
 
-        instruction,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2)
+        # instruction,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2)
+        instruction = choose_person()
         if hand_queue != None:
             print(len(hand_queue))
             for person in hand_queue:   # hand queue tonen op het scherm (naam van persoon via person.name)
