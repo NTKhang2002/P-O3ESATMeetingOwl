@@ -110,6 +110,7 @@ while True:
             color = GREEN
         # Visualize the mouth in green
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+        print(x,y)
         cv2.drawContours(frame, [mouthHull], -1, color, 1)
     # Write the frame into the file 'output.avi'
     # out.write(frame)
