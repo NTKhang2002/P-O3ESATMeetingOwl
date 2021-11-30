@@ -6,8 +6,16 @@ import math
 
 
 def move(x,x_oud,nodeMcu,straal,helft_pixels):
+    print("x: " + str(x))
+    print("x_oud: " + str(x_oud))
     if x != None:
-        if abs(x_oud - x) > 75:
+<<<<<<< HEAD
+
+        if abs(x_oud - x) > 150:
+            x_oud = x
+=======
+        if abs(x_oud - x) > 150:
+>>>>>>> a333fa258d49aeaeadd8bb0980b65ec9faa89e01
             if x > helft_pixels:
                 x = x-helft_pixels
                 angle = 90 - (math.sin(x / straal))*180/3.14
@@ -18,7 +26,11 @@ def move(x,x_oud,nodeMcu,straal,helft_pixels):
                 angle = 90
             print(angle)
             print(math.sin(x / straal)*180/3.14)
-            x = x_oud
+<<<<<<< HEAD
+
+=======
+            x_oud = x
+>>>>>>> a333fa258d49aeaeadd8bb0980b65ec9faa89e01
 
             nodeMcu.write(str(angle).encode())
     return x_oud

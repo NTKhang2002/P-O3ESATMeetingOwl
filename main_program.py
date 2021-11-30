@@ -49,6 +49,7 @@ class people:
         self.hx = None
         self.hy = None
         self.hs = None
+
 def argsfunc():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
