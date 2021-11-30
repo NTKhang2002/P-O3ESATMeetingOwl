@@ -1,12 +1,13 @@
 import multiprocessing
 from main_program_test_final import pipeline
 from coordinaatzoom import coordinaatzoomfunctie
-
+zoomcamera = 2
+widecamera = 1
 
 
 def main():
-    p2 = multiprocessing.Process(target=coordinaatzoomfunctie)
-    p1 = multiprocessing.Process(target=pipeline)
+    p2 = multiprocessing.Process(target=coordinaatzoomfunctie, args=(zoomcamera,))
+    p1 = multiprocessing.Process(target=pipeline, args=(widecamera,))
 
 
     p2.start()

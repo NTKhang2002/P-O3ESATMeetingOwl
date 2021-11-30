@@ -48,8 +48,8 @@ def mostcentralface(width,faces,Central_bounding):
             return xlijst.index(minx)
     return False
 
-def coordinaatzoomfunctie():
-    HEIGHT = 480
+def coordinaatzoomfunctie(camera=0):
+    HEIGHT = 720
     WIDTH = int(16 / 9 * HEIGHT)
     MIDDLEPOINTX = int(WIDTH / 2)
     MIDDLEPOINTY = int(HEIGHT / 2)
@@ -66,7 +66,7 @@ def coordinaatzoomfunctie():
     # Create cascade
     FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
     # Capture from camera, 0 because webcam
-    capzoom = cv2.VideoCapture(2,cv2.CAP_DSHOW)
+    capzoom = cv2.VideoCapture(camera,cv2.CAP_DSHOW)
     capzoom.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     capzoom.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     capzoom.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)

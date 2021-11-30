@@ -67,13 +67,14 @@ def argsfunc():
     args = vars(ap.parse_args())
     return args
 
-def set_video():
+def set_video(camera):
     HEIGHT = 720
     WIDTH = int(16 / 9 * HEIGHT)
-    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+    cap = cv2.VideoCapture(camera, cv2.CAP_DSHOW)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+    return cap
 
 
 def min_hand(person,persons):
@@ -160,7 +161,7 @@ def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handti
 
 
 
-def pipeline(detectionCon = 0.8, maxHands = 4):
+def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
     """
     Main pipeline: calls and implements all modules
     """
@@ -171,7 +172,7 @@ def pipeline(detectionCon = 0.8, maxHands = 4):
         - Creating initial 'person' objects
     """
     # Starting video
-    cap = set_video()
+    cap = set_video(camera)
 
     # Initializing mudles
     detector = HandDetector(detectionCon=detectionCon, maxHands=maxHands)
@@ -190,7 +191,7 @@ def pipeline(detectionCon = 0.8, maxHands = 4):
 
     # Startup Arduino
     x_oud = 5000
-    nodeMcu = serial.Serial("COM10", 9600)  # Sartup
+    nodeMcu = serial.Serial("COM5", 9600)  # Sartup
     straal = 694
     max_aantal_pixels = 1080
     helft_pixels = max_aantal_pixels / 2
@@ -236,7 +237,8 @@ def pipeline(detectionCon = 0.8, maxHands = 4):
         print(instruction)
         if instruction == "Error":
             print("ERROR: Make a decision!")
-        x_oud = servo_controller.move(instruction,x_oud,nodeMcu,straal,helft_pixels)
+        if instruction != None and instruction != "Error":
+            x_oud = servo_controller.move(instruction,x_oud,nodeMcu,straal,helft_pixels)
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
