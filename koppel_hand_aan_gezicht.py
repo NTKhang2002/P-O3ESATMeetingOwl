@@ -76,8 +76,8 @@ def koppelen(xhanden, xgezichten):
 def main(detectionCon = 0.8, maxHands = 4):
     # Camera preparation
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    cap.set(3,1000)
-    cap.set(4,100)
+    cap.set(50,1000)
+    cap.set(40,100)
     # Initializing HandDetector module
     detector = HandDetector(detectionCon=detectionCon, maxHands=maxHands)
 
