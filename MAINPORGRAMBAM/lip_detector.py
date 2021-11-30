@@ -75,7 +75,7 @@ def update(participant, x, y,mond_algemeen):
             participant.closed_1 = time.time()
     if (participant.closed_2 - participant.closed_1) > 3:
         participant.talking = False
-    elif (participant.open[participant.teller_open] - participant.open[participant.teller_open - 4]) < 2:
+    elif (participant.open[participant.teller_open] - participant.open[participant.teller_open - 4]) < 4:
         participant.talking = True
 
 def localiser(participant, x):

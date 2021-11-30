@@ -110,7 +110,8 @@ def min_face(person,persons):
                 min_person = old_person
     min_person.add_facedata(person[0], person[1], person[2], person[3])
 
-def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2):
+# def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2):
+def choose_person(persons):
     """
     Returns x value (face) of person that is talking
     """
@@ -233,7 +234,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
             min_face(person,persons)
 
         # instruction,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2)
-        instruction = choose_person()
+        instruction = choose_person(persons)
         if hand_queue != None:
             print(len(hand_queue))
             for person in hand_queue:   # hand queue tonen op het scherm (naam van persoon via person.name)
