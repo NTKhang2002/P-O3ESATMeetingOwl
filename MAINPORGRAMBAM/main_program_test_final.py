@@ -1,4 +1,5 @@
 import time
+import serial
 import status_hand as sh
 import cv2
 from cvzone.HandTrackingModule import HandDetector
@@ -6,7 +7,7 @@ import dlib
 import argparse
 # import pyvirtualcam
 import lip_detector
-# import servo_controller
+import servo_controller
 
 class people:
     id = 0
@@ -69,7 +70,7 @@ def argsfunc():
 def set_video():
     HEIGHT = 720
     WIDTH = int(16 / 9 * HEIGHT)
-    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
