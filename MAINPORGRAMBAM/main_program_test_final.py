@@ -202,7 +202,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
     straal_cm = 150
     max_aantal_pixels = 1280
     helft_pixels = max_aantal_pixels / 2
-    straal = (max_aantal_pixels/210)*straal_cm
+    straal = (max_aantal_pixels/185)*straal_cm
 
     for k in range(20): # Initialization during first 20 frames
         success, img = cap.read()

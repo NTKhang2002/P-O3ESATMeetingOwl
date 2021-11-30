@@ -15,7 +15,7 @@ import dlib
 import cv2
 
 participant_counter = 0
-marge_x = 50
+marge_x = 150
 tijd_algemeen = time.time()
 mond_algemeen = False
 
@@ -34,7 +34,7 @@ class player:
         self.closed_1 = 0
         self.closed_2 = 1
         self.teller_open = 0
-        self.open = [10, 0, 0, 0, 0]
+        self.open = [10, 0, 0]
     def return_tuple(self):
         return (self.fx,self.fy,self.talking,self.name)
     def reset(self):
@@ -44,7 +44,7 @@ class player:
         self.present = False
         self.mouth = False
         self.teller_open = 0
-        self.open = [10, 0, 0, 0, 0]
+        self.open = [10, 0, 0]
 
 participant_1 = player(-1000,-1000)
 participant_1.name = "Ben" #Dover
@@ -64,7 +64,7 @@ def update(participant, x, y,mond_algemeen):
     if mond_algemeen:
         if not participant.mouth:
             participant.mouth = True
-            if participant.teller_open == 4:
+            if participant.teller_open == 2:
                 participant.teller_open = 0
             participant.teller_open += 1
             participant.open[participant.teller_open] = time.time()
@@ -73,9 +73,9 @@ def update(participant, x, y,mond_algemeen):
         if participant.mouth:
             participant.mouth = False
             participant.closed_1 = time.time()
-    if (participant.closed_2 - participant.closed_1) > 3:
-        participant.talking = False
-    elif (participant.open[participant.teller_open] - participant.open[participant.teller_open - 4]) < 4:
+    if (participant.closed_2 - participant.closed_1) > 2:
+        participant.talking = Falseq
+    elif (participant.open[participant.teller_open] - participant.open[participant.teller_open - 2]) < 4:
         participant.talking = True
 
 def localiser(participant, x):
@@ -88,8 +88,9 @@ def check(participant,tijd_algemeen,frame):
     if participant.present:
 
         cv2.putText(frame, participant.name + " ("+ str(participant.fx) +", " + str(participant.fy) + ")", (participant.fx, participant.fy), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)  # TEKST BOVEN HOOFD
-        if(tijd_algemeen - participant.tijd) > 5:
+        if(tijd_algemeen - participant.tijd) > 3:
             participant.reset()
+
 
 
 def assign(x, y, mond_algemeen):
