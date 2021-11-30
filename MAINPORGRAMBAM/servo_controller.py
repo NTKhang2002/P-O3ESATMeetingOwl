@@ -7,7 +7,7 @@ import math
 
 def move(x,x_oud,nodeMcu,straal,helft_pixels):
     if x != None:
-        if abs(x_oud - x) > 150:
+        if abs(x_oud - x) > 75:
             x_oud = x
             if x > helft_pixels:
                 x = x-helft_pixels
