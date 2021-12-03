@@ -198,7 +198,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
 
     # Startup Arduino
     x_oud = 5000
-    nodeMcu = serial.Serial("COM10", 9600)  # Sartup
+    nodeMcu = serial.Serial("COM3", 9600)  # Sartup
     straal_cm = 150
     max_aantal_pixels = 1280
     helft_pixels = max_aantal_pixels / 2
