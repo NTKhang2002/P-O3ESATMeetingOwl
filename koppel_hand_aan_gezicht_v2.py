@@ -20,7 +20,6 @@ def koppelen(xhanden, xgezichten):
             if afstand <= min_afstand:
                 min_afstand = afstand
                 juiste_gezicht = index
-                print(juiste_gezicht)
                 index += 1
             else:
                 pass
@@ -53,7 +52,7 @@ def main(detectionCon = 0.8, maxHands = 4):
             pass
         if len(handstatus) != 0:
             lijst_hand_gezicht = koppelen(handstatus,xgezicht)
-            yield lijst_hand_gezicht
+            print(lijst_hand_gezicht)
 
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):

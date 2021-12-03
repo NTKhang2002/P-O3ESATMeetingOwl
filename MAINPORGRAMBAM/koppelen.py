@@ -22,7 +22,6 @@ def koppelen(xhanden, xgezichten):
                 juiste_gezicht = index
                 index += 1
             else:
-                pass
                 index += 1
         ok = (xhanden[i], xgezichten[juiste_gezicht])
         gekoppeld.append(ok)
@@ -43,9 +42,11 @@ def main(img,detector,detectionCon = 0.8, maxHands = 4):
         else:
             # return face
             pass
-        if len(handstatus) != 0:
+        if len(handstatus) != 0 and len(xgezicht) != 0:
             lijst_hand_gezicht = koppelen(handstatus,xgezicht)
             yield lijst_hand_gezicht
+        else:
+            yield print("ER ZIJN GEEN GEICHTEN OF HANDEN")
 
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
