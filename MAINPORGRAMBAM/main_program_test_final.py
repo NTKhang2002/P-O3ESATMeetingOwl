@@ -60,19 +60,11 @@ class people:
         self.hs = None
     def show_name(self):
         return self.name
-def argsfunc():
-    # construct the argument parse and parse the arguments
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-p", "--shape-predictor", required=False, default='shape_predictor_68_face_landmarks.dat',
-                    help="path to facial landmark predictor")
-    ap.add_argument("-w", "--webcam", type=int, default=0,
-                    help="index of webcam on system")
-    args = vars(ap.parse_args())
-    return args
 
-def set_video(camera):
-    HEIGHT = 720
-    WIDTH = int(16 / 9 * HEIGHT)
+
+def set_video(camera,Width,Height):
+    HEIGHT = Height
+    WIDTH = Width
     cap = cv2.VideoCapture(camera, cv2.CAP_DSHOW)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
@@ -169,6 +161,8 @@ def choose_person(persons):
 
 
 def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
+    Height = 720
+    Width = int(16/9*Height)
     """
     Main pipeline: calls and implements all modules
     """
@@ -179,13 +173,12 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
         - Creating initial 'person' objects
     """
     # Starting video
-    cap = set_video(camera)
+    cap = set_video(camera,Width,Height)
 
     # Initializing mudles
     detector = HandDetector(detectionCon=detectionCon, maxHands=maxHands)
-    args = argsfunc()
     detector_face = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor(args["shape_predictor"])
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
     # Some variables
     person_tracked = False
@@ -198,9 +191,9 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
 
     # Startup Arduino
     x_oud = 5000
-    nodeMcu = serial.Serial("COM3", 9600)  # Sartup
+    nodeMcu = serial.Serial("COM5", 9600)  # Sartup
     straal_cm = 150
-    max_aantal_pixels = 1280
+    max_aantal_pixels = Width
     helft_pixels = max_aantal_pixels / 2
     straal = (max_aantal_pixels/185)*straal_cm
 
