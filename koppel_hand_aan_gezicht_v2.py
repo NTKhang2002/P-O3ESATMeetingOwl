@@ -14,15 +14,18 @@ def koppelen(xhanden, xgezichten):
     gekoppeld = []
     for i in range(len(xhanden)):
         min_afstand = 10000000000000000
-        juiste_gezicht = 0
         index = 0
         for xgezicht in xgezichten:
             afstand = abs(xhanden[i] - xgezicht)
             if afstand <= min_afstand:
                 min_afstand = afstand
                 juiste_gezicht = index
-            index += 1
-        ok = (i,juiste_gezicht)
+                print(juiste_gezicht)
+                index += 1
+            else:
+                pass
+                index += 1
+        ok = (xhanden[i], xgezichten[juiste_gezicht])
         gekoppeld.append(ok)
     return gekoppeld #geeft een lijst met tuples (index_xhanden, index_xgezichten)
 
@@ -34,7 +37,6 @@ def main(detectionCon = 0.8, maxHands = 4):
     cap.set(40,100)
     # Initializing HandDetector module
     detector = HandDetector(detectionCon=detectionCon, maxHands=maxHands)
-
     while True:
         success, img = cap.read()
         hands, img = detector.findHands(img)
@@ -51,7 +53,7 @@ def main(detectionCon = 0.8, maxHands = 4):
             pass
         if len(handstatus) != 0:
             lijst_hand_gezicht = koppelen(handstatus,xgezicht)
-            print(lijst_hand_gezicht)
+            yield lijst_hand_gezicht
 
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
