@@ -136,7 +136,7 @@ def main(detectionCon = 0.8, maxHands = 4):
     """
     HEIGHT = 720
     WIDTH = int(16 / 9 * HEIGHT)
-    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     # cap.set(3, 1000)
     # cap.set(4, 100)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))

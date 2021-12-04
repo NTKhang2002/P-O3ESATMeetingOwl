@@ -74,7 +74,7 @@ def update(participant, x, y,mond_algemeen):
             participant.mouth = False
             participant.closed_1 = time.time()
     if (participant.closed_2 - participant.closed_1) > 2:
-        participant.talking = Falseq
+        participant.talking = False
     elif (participant.open[participant.teller_open] - participant.open[participant.teller_open - 2]) < 4:
         participant.talking = True
 
@@ -95,12 +95,13 @@ def check(participant,tijd_algemeen,frame):
 
 def assign(x, y, mond_algemeen):
     for participant in participant_list:
+        if localiser(participant, x):
+            update(participant, x, y, mond_algemeen)
+            break
         if not participant.present:
             update(participant, x, y, mond_algemeen)
             break
-        elif localiser(participant, x):
-            update(participant, x, y, mond_algemeen)
-            break
+
 
 
 def mouth_aspect_ratio(mouth):
@@ -119,9 +120,10 @@ def mouth_aspect_ratio(mouth):
     # return the mouth aspect ratio
     return mar
 
-def lipdetector(frame, detector,predictor, MOUTH_AR_THRESH = 0.70, mStart = 49, mEnd = 68):
+def lipdetector(frame, detector,predictor,MOUTH_AR_THRESH = 0.70, mStart = 49, mEnd = 68):
     # loop over frames from the video stream
     while True:
+
         # grab the frame from the threaded video file stream, resize
         # it, and convert it to grayscale
         # channels)
@@ -155,7 +157,7 @@ def lipdetector(frame, detector,predictor, MOUTH_AR_THRESH = 0.70, mStart = 49, 
                 mond_algemeen = False
             # Visualize the mouth in green
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)      #Square over face
-            assign(x, y,mond_algemeen)
+            assign(x+w, y+h,mond_algemeen)
             cv2.drawContours(frame, [mouthHull], -1, color, 1)
         tijd_algemeen = time.time()
         for k in participant_list:
@@ -165,4 +167,5 @@ def lipdetector(frame, detector,predictor, MOUTH_AR_THRESH = 0.70, mStart = 49, 
 def face_status():
     for participant in participant_list:
         yield participant.return_tuple()
+
 

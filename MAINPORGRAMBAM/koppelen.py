@@ -5,7 +5,7 @@ opgestoken hand(en) aan een gezicht koppelen
 """
 
 import cv2
-from test import hand_status
+from hand_status import hand_status
 from cvzone.HandTrackingModule import HandDetector
 
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -38,16 +38,11 @@ def main(img,detector,detectionCon = 0.8, maxHands = 4):
         if len(faces) != 0:
             for (x, y, w, h) in faces:
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-                xgezicht.append((x + w) / 2)
-        else:
-            # return face
-            pass
+                xgezicht.append(x + w)
         if len(handstatus) != 0 and len(xgezicht) != 0:
             lijst_hand_gezicht = koppelen(handstatus,xgezicht)
-            yield lijst_hand_gezicht
+            return lijst_hand_gezicht
         else:
-            yield print("ER ZIJN GEEN GEICHTEN OF HANDEN")
+            return #print("ER ZIJN GEEN GEZICHTEN OF HANDEN")
 
-        cv2.imshow("image", img)
-        if cv2.waitKey(1) == ord('q'):
-            break
+
