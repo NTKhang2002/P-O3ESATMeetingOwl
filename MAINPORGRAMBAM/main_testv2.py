@@ -139,13 +139,13 @@ def update_face(fx,fy,mouth_open,persons,marge_x = 150):
 def determine_talking(person,mouth_open):
 
     if mouth_open:  # mouth is currently open
-        print(person.get_mouth_open())
+
         if person.get_mouth_open() == False: # mouth was previously closed
             print(person.get_mouth_open())
             person.set_mouth_open(mouth_open)
             if person.get_mouth_open_time_index() == 2:
                 person.reset_mouth_open_time_index()
-            print(person.get_mouth_open_time_index())
+
             person.update_mouth_open_time_index()
             person.set_mouth_open_time_list()
     else:           # mouth is currently closed
@@ -218,7 +218,7 @@ def choose_person(persons,person_tracked,queue,queuetime1,queuetime2):
 
 
 
-def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 600,max_persons = 4):
+def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_persons = 4):
     """
     Main pipeline: calls and implements all modules
     """
@@ -242,6 +242,9 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 600,max_person
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 
+    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    print(width, height)
 
     # Some variables
     fps = 0
@@ -263,11 +266,12 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 600,max_person
     straal_cm = 150
 
 
-    max_aantal_pixels = WIDTH
-    helft_pixels = max_aantal_pixels / 2
-    straal = (max_aantal_pixels/210)*straal_cm
+
+    helft_pixels = width / 2
+
 
     success, img = cap.read()
+
     img, facestatus = lip_detector.lipdetector(img, detector_face, predictor)
     for person in facestatus:
         fx = person[0]
@@ -312,7 +316,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 600,max_person
         if instruction == "Error":
             print("ERROR: Make a decision!")
         if instruction != None and instruction != "Error":
-            x_oud = servo_controller.move(instruction,x_oud,nodeMcu,straal,helft_pixels)
+            x_oud = servo_controller.move(instruction,x_oud,nodeMcu,width,straal_cm,helft_pixels)
         for person in persons:
             check_presence(person,img)
 
