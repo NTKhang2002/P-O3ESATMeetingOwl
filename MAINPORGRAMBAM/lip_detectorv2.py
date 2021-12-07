@@ -34,7 +34,7 @@ def mouth_aspect_ratio(mouth):
     # return the mouth aspect ratio
     return mar
 
-def lipdetector(frame, detector,predictor,MOUTH_AR_THRESH = 0.70, mStart = 49, mEnd = 68):
+def lipdetector(frame, detector,predictor,MOUTH_AR_THRESH = 0.67, mStart = 49, mEnd = 68):
     # loop over frames from the video stream
     while True:
         faces = []

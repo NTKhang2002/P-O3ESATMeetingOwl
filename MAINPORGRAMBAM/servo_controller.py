@@ -6,7 +6,7 @@ import math
 
 
 def move(x,x_oud,nodeMcu,straal,helft_pixels):
-    if x != None:
+    if x != None and isinstance(x, str) == False:
         if abs(x_oud - x) > 75:
             x_oud = x
             if x > helft_pixels:
