@@ -3,6 +3,7 @@ import time
 from cvzone.HandTrackingModule import HandDetector
 
 def hand_status(detector, hands):
+    hand_list = []
     if hands:
         for id in range(len(hands)):
             hand = hands[id]
@@ -18,9 +19,9 @@ def hand_status(detector, hands):
             else:
                 hand_status = 0
 
-            result = (hand_status, cx, cy)
-            yield result
-
+            result = [hand_status, cx, cy]
+            hand_list.append(result)
+    return hand_list
 def main(detectionCon = 0.8, maxHands = 4):
     # Camera preparation
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)

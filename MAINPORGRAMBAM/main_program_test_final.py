@@ -1,6 +1,6 @@
 import time
 import serial
-import status_hand as sh
+# import status_hand as sh
 import cv2
 from cvzone.HandTrackingModule import HandDetector
 import dlib
@@ -8,10 +8,11 @@ import argparse
 # import pyvirtualcam
 import lip_detector
 import servo_controller
+import koppelen
 
 class people:
     id = 0
-    def __init__(self,fx,fy,t,hx,hy,hs,name):
+    def __init__(self,fx,fy,t,hx,name):
         """
         fx, fy: face position
         t: talking status
@@ -25,14 +26,13 @@ class people:
         self.fy = fy
         self.t = t
         self.hx = hx
-        self.hy = hy
-        self.hs = hs
-        self.active = False
+        # self.hy = hy
+        # self.hs = hs
         self.name = name
-    def add_handdata(self,hx,hy,hs):
+    def add_handdata(self,hx):
         self.hx = hx
-        self.hy = hy
-        self.hs = hs
+        # self.hy = hy
+        # self.hs = hs
     def add_facedata(self,fx,fy,t,name):
         # if len(self.fx) < 10:
         #     self.fx.append(fx)
@@ -49,46 +49,45 @@ class people:
     def show_hx(self):
         return self.hx
     def show_data(self):
-        return self.id, self.fx, self.fy, self.t ,self.hx, self.hy, self.hs, self.name
+        return self.id, self.fx, self.fy, self.t ,self.hx, self.name
     def is_talking(self):
         return self.t
-    def hand_status(self):
-        return self.hs
+    # def hand_status(self):
+    #     return self.hs
     def reset_hands(self):
         self.hx = None
-        self.hy = None
-        self.hs = None
+        # self.hy = None
+        # self.hs = None
     def show_name(self):
         return self.name
 
 
-def set_video(camera,Width,Height):
-    HEIGHT = Height
-    WIDTH = Width
+def set_video(camera,WIDTH,HEIGHT):
     cap = cv2.VideoCapture(camera, cv2.CAP_DSHOW)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE,2)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
     return cap
 
 
-def min_hand(person,persons):
-    hx = person[1]
-    min_distance = None
-    min_person = None
-    for old_person in persons:
-        old_fx = old_person.show_fx()
-        if min_distance == None:
-            min_distance = abs(hx - old_fx)
-            min_person = old_person
-        else:
-            if abs(hx - old_fx) < min_distance:
-                min_distance = abs(hx - old_fx)
-                min_person = old_person
-    min_person.add_handdata(person[1], person[2], person[0])
+# def min_hand(person,persons):
+#     hx = person[1]
+#     min_distance = None
+#     min_person = None
+#     for old_person in persons:
+#         old_fx = old_person.show_fx()
+#         if min_distance == None:
+#             min_distance = abs(hx - old_fx)
+#             min_person = old_person
+#         else:
+#             if abs(hx - old_fx) < min_distance:
+#                 min_distance = abs(hx - old_fx)
+#                 min_person = old_person
+#     min_person.add_handdata(person[1], person[2], person[0])
 
-def min_face(person,persons):
-    fx = person[0]
+
+def min_face(fx,persons):
     min_distance = None
     min_person = None
     for old_person in persons:
@@ -100,8 +99,8 @@ def min_face(person,persons):
             if abs(fx - old_fx) < min_distance:
                 min_distance = abs(fx - old_fx)
                 min_person = old_person
-    min_person.add_facedata(person[0], person[1], person[2], person[3])
 
+    return min_person
 # def choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2):
 def choose_person(persons):
     """
@@ -161,8 +160,8 @@ def choose_person(persons):
 
 
 def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
-    Height = 720
-    Width = int(16/9*Height)
+    HEIGHT = 480
+    WIDTH = int(16/9*HEIGHT)
     """
     Main pipeline: calls and implements all modules
     """
@@ -173,9 +172,9 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
         - Creating initial 'person' objects
     """
     # Starting video
-    cap = set_video(camera,Width,Height)
+    cap = set_video(camera,WIDTH,HEIGHT)
 
-    # Initializing mudles
+    # Initializing modules
     detector = HandDetector(detectionCon=detectionCon, maxHands=maxHands)
     detector_face = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -189,20 +188,20 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
     persons = list()
     hand_queue = list()
 
-    # Startup Arduino
-    x_oud = 5000
-    nodeMcu = serial.Serial("COM5", 9600)  # Sartup
-    straal_cm = 150
-    max_aantal_pixels = Width
-    helft_pixels = max_aantal_pixels / 2
-    straal = (max_aantal_pixels/185)*straal_cm
+    # # Startup Arduino
+    # x_oud = 5000
+    # nodeMcu = serial.Serial("COM5", 9600)  # Sartup
+    # straal_cm = 150
+    # max_aantal_pixels = Width
+    # helft_pixels = max_aantal_pixels / 2
+    # straal = (max_aantal_pixels/185)*straal_cm
 
     for k in range(20): # Initialization during first 20 frames
         success, img = cap.read()
         lip_detector.lipdetector(img,detector_face,predictor)
         facestatus = lip_detector.face_status()
     for person in facestatus:
-        persons.append(people(person[0],person[1],person[2],None,None,None,person[3]))
+        persons.append(people(person[0],person[1],person[2],None,person[3]))
     for p in range(len(persons)):
         print(persons[p].show_data())
     print("Initialization complete")
@@ -216,17 +215,24 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
             - Creating instruction for Arduino
         """
         success, img = cap.read() # initial image (clean)
-        hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
-        handstatus = sh.hand_status(detector, hands)
+        # hands, img = detector.findHands(img)    # returns 'hands' and 'img', image contains visual feedback on hands
+        # handstatus = sh.hand_status(detector, hands)
         for person in persons:
             person.reset_hands()
-        for person in handstatus:
-            min_hand(person,persons)
+        # for person in handstatus:
+        #     min_hand(person,persons)
         img = lip_detector.lipdetector(frame = img,detector = detector_face,predictor = predictor)
         facestatus = lip_detector.face_status()
         for person in facestatus:
-            min_face(person,persons)
-
+            fx = person[0]
+            min_person = min_face(fx,persons)
+            min_person.add_facedata(person[0], person[1], person[2], person[3])
+        hand_face = koppelen.main(img,detector)
+        if hand_face != None:
+            for person in hand_face:
+                fx = person[1]
+                min_person = min_face(fx,persons)
+                min_person.add_handdata(person[0])
         # instruction,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2 = choose_person(persons,person_tracked,hand_queue,hand1,hand2,handtime1,handtime2)
         instruction = choose_person(persons)
         if hand_queue != None:
@@ -235,12 +241,13 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
                 print(person.show_name())
                 cv2.putText(img, person.name + " (" + str(person.hx) + ", " + str(person.hy) + ")",
                           (person.hx, person.hy), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)  # TEKST BOVEN HAND
-
-        print(instruction)
+        for person in persons:
+            print(person.show_fx(),person.show_hx())
+        # print(instruction)
         if instruction == "Error":
             print("ERROR: Make a decision!")
-        if instruction != None and instruction != "Error":
-            x_oud = servo_controller.move(instruction,x_oud,nodeMcu,straal,helft_pixels)
+        # if instruction != None and instruction != "Error":
+        #     x_oud = servo_controller.move(instruction,x_oud,nodeMcu,straal,helft_pixels)
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
@@ -248,3 +255,6 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4):
         # img = cv2.flip(img, 1)
         # cam.send(img)
         # cam.sleep_until_next_frame()
+    cap.release()
+    cv2.destroyAllWindows()
+pipeline(camera=0)
