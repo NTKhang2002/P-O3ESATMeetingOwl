@@ -1,12 +1,9 @@
-
 import cv2
 import time
 
-from cvzone.HandTrackingModule import HandDetector
+from hand_positie import HandDetector
 
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-
-
 
 def hand_status(detector, hands):
     h = []
@@ -17,8 +14,12 @@ def hand_status(detector, hands):
             cx, cy = hand["center"]  # centerpoint: cx cy
             fingers = detector.fingersUp(hand)
             h.append(cx)
+            positie = detector.voorkant_hand(hand)
             if fingers == [1,1,1,1,1] or fingers == [0,1,1,1,1]: #als alle vingers van een hand (uitgezonderd duim) zijn opgestoken
-                status_alle_handen.append(True)
+                if positie == True:
+                    status_alle_handen.append(True)
+                else:
+                    status_alle_handen.append(False)
             else:
                 status_alle_handen.append(False)
         return h, status_alle_handen #h = lijst met xcoord van alle handen, status_alle_handen = lijst met voor alle handen True of False
@@ -117,8 +118,10 @@ def xco_resultaat(gemiddelde_lijst,gegevens_periode):
             return xco_result
         return xco_result
 
-
-
+"""
+buiten de functies zijn er ook delen die in de main moeten staan
+ik heb ze tussen twee comments gezet
+"""
 
 def main(detectionCon = 0.8, maxHands = 4):
     # Camera preparation
@@ -127,16 +130,20 @@ def main(detectionCon = 0.8, maxHands = 4):
     cap.set(40,100)
     # Initializing HandDetector module
     detector = HandDetector(detectionCon=detectionCon, maxHands=maxHands)
+
     #dit stuk hieronder kopieren:
     gedetecteerd = []
-    #--
+    #tot hier (er is nog vanonder)
+
     while True:
         success, img = cap.read()
         hands, img = detector.findHands(img)
-        #dit hieronder:
-        handcoord, status = hand_status(detector, hands) # handstatus = lijst met xcoord van alle handen, status = lijst met True an False
+
+        #dit dtuk kopieren:
+        handcoord, status = hand_status(detector, hands) # handcoord = lijst met xcoord van alle handen, status = lijst met True an False
         xco_status = xhand_en_status(handcoord,status)
-        #--
+        #tot hier (er is nog)
+
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray, 1.3, 5)
         xgezicht = []
@@ -147,18 +154,22 @@ def main(detectionCon = 0.8, maxHands = 4):
         else:
             # return face
             pass
+
         #vanaf hier:
         gedetecteerd.append(xco_status)
         if len(gedetecteerd) == 10:
-            #print(gedetecteerd,'g')  # lijst van frames, elke frame is een lijst
-                                 # per frame zijn er tuples per hand: (xcoord, True of False) of indien er geen handen zijn: (None,None)
+            # gedetecteerd is een lijst van frames, elke frame is ook een lijst
+            # in de lijst van de frame zitten tuples (de tuples stellen handen voor die
+            # in dat frame voorkomen): (xcoord hand, True of False) of indien er geen handen zijn gwn: (None,None)
+            # er is gekozen om per 10 frames te detecteren, maar dat kan nog gewijzigd worden
             gem = gemiddelde_xco(x_periode(gedetecteerd)) #lijst van gemiddelde xcoord van opgestoken handen
             xhanden = xco_resultaat(gem,gedetecteerd)
             if len(xhanden) != 0 and len(xgezicht) != 0:
                 resultaat = koppelen(xhanden,xgezicht)
                 print(resultaat)
             gedetecteerd = []
-        #tot hier
+        #tot hier (dat was het)
+
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break

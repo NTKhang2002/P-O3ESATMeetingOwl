@@ -96,22 +96,28 @@ class HandDetector:
             return allHands
 
     def voorkant_hand(self,myHand):
-        nodige_id = [5,17]
+        """"
+        Als de camera de voorkant van uw hand ziet dan returned deze functie True.
+        Als het de achterkant ziet dan returned deze functie False.
+        opmerking: de ycoordinaat loopt van boven naar onder op het scherm
+        """
+        nodige_id = [5,17,0,9]
         myHandType =myHand["type"]
         myLmList = myHand["lmList"]
         if myHandType == "Right":
             #xcoord van de wijsvinger moet groter zijn dan de xcoord van de pink
-            if myLmList[nodige_id[0]][0] > myLmList[nodige_id[1]][0]:
-                print('in orde')
+            #ycoord van pols moet hoger zijn dan ycoord van de middelvinger
+            if myLmList[nodige_id[0]][0] > myLmList[nodige_id[1]][0] and myLmList[nodige_id[2]][1] > myLmList[nodige_id[3]][1]:
+                return True
             else:
-                print('draai uw rechterhand om')
+                return False
         if myHandType == 'Left':
             # xcoord van de pink moet groter zijn dan de xcoord van de wijsvinger
-            if myLmList[nodige_id[1]][0] > myLmList[nodige_id[0]][0]:
-                print('in orde')
+            # ycoord van pols moet hoger zijn dan ycoord van de middelvinger
+            if myLmList[nodige_id[1]][0] > myLmList[nodige_id[0]][0] and myLmList[nodige_id[2]][1] > myLmList[nodige_id[3]][1]:
+                return True
             else:
-                print('draai uw linkerhand om')
-        return []
+                return False
 
     def fingersUp(self,myHand):
         """
@@ -205,8 +211,6 @@ def main():
                 # Find Distance between two Landmarks. Could be same hand or different hands
                 length, info, img = detector.findDistance(lmList1[8], lmList2[8], img)  # with draw
                 # length, info = detector.findDistance(lmList1[8], lmList2[8])  # with draw
-            for hand in hands:
-                detector.voorkant_hand(hand)
         # Display
         cv2.imshow("Image", img)
         cv2.waitKey(1)
