@@ -41,6 +41,7 @@ def main(img,detector,detectionCon = 0.8, maxHands = 4):
                 xgezicht.append(x + w)
         if len(handstatus) != 0 and len(xgezicht) != 0:
             lijst_hand_gezicht = koppelen(handstatus,xgezicht)
+            print(lijst_hand_gezicht)
             return lijst_hand_gezicht
         else:
             return #print("ER ZIJN GEEN GEZICHTEN OF HANDEN")
