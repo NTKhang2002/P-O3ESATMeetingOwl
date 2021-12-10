@@ -6,6 +6,7 @@ from hand_positie import HandDetector
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 def hand_status(detector, hands):
+    print("handstatus")
     h = []
     status_alle_handen = []
     if hands: #als er (een) hand(en) (is) zijn
@@ -30,6 +31,7 @@ def hand_status(detector, hands):
 
 
 def koppelen(xhanden, xgezichten):
+    print("koppelen")
     gekoppeld = []
     for i in range(len(xhanden)):
         min_afstand = 10000000000000000
@@ -47,6 +49,7 @@ def koppelen(xhanden, xgezichten):
     return gekoppeld #geeft een lijst met tuples (xhanden, xgezichten)
 
 def xhand_en_status(xhanden,status_handen):
+    print("xhand en status")
     xcoord_en_status = []
     if len(xhanden) != 0:
         for index in range(len(xhanden)):
@@ -57,6 +60,7 @@ def xhand_en_status(xhanden,status_handen):
 
 
 def x_periode(lijst):
+    print("xperiode")
     standaard_xco = []
     een_frame = []
     for frame in lijst:
@@ -73,6 +77,7 @@ def x_periode(lijst):
     return standaard_xco
 
 def gemiddelde_xco(lijst):
+    print("gemiddelde_xco")
     if len(lijst) == 0:
         pass
     else:
@@ -99,9 +104,12 @@ def gemiddelde_xco(lijst):
                        # [5.2, 10] = [xcoord hand1, van het totaal aantel frames is deze hand 10 keer gedetecteerd]
 
 def xco_resultaat(gemiddelde_lijst,gegevens_periode):
+    print("xco_resultaat")
     if gemiddelde_lijst == None:
+        print("Geen handen")
         return []
     elif gemiddelde_lijst == []:
+        print("geen opgestoken handen")
         return []
     else:
         xco_result = []
@@ -122,38 +130,41 @@ ik heb ze tussen twee comments gezet
 """
 
 def main(img,detector,gedetecteerd,detectionCon = 0.8, maxHands = 4):
+    print("main begin")
+    # hier stond ne while true
+    hands, img = detector.findHands(img)
 
-    while True:
-        hands, img = detector.findHands(img)
+    #dit dtuk kopieren:
+    handcoord, status = hand_status(detector, hands) # handcoord = lijst met xcoord van alle handen, status = lijst met True an False
+    xco_status = xhand_en_status(handcoord,status)
+    #tot hier (er is nog)
 
-        #dit dtuk kopieren:
-        handcoord, status = hand_status(detector, hands) # handcoord = lijst met xcoord van alle handen, status = lijst met True an False
-        xco_status = xhand_en_status(handcoord,status)
-        #tot hier (er is nog)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    xgezicht = []
+    if len(faces) != 0:
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+            xgezicht.append((x + w) / 2)
+    else:
+        # return face
+        pass
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-        xgezicht = []
-        if len(faces) != 0:
-            for (x, y, w, h) in faces:
-                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-                xgezicht.append((x + w) / 2)
-        else:
-            # return face
-            pass
+    #vanaf hier:
+    gedetecteerd.append(xco_status)
+    if len(gedetecteerd) == 10:
+        # gedetecteerd is een lijst van frames, elke frame is ook een lijst
+        # in de lijst van de frame zitten tuples (de tuples stellen handen voor die
+        # in dat frame voorkomen): (xcoord hand, True of False) of indien er geen handen zijn gwn: (None,None)
+        # er is gekozen om per 10 frames te detecteren, maar dat kan nog gewijzigd worden
+        gem = gemiddelde_xco(x_periode(gedetecteerd)) #lijst van gemiddelde xcoord van opgestoken handen
+        xhanden = xco_resultaat(gem,gedetecteerd)
+        if len(xhanden) != 0 and len(xgezicht) != 0:
+            resultaat = koppelen(xhanden,xgezicht)
+            gedetecteerd = []
 
-        #vanaf hier:
-        gedetecteerd.append(xco_status)
-        if len(gedetecteerd) == 10:
-            # gedetecteerd is een lijst van frames, elke frame is ook een lijst
-            # in de lijst van de frame zitten tuples (de tuples stellen handen voor die
-            # in dat frame voorkomen): (xcoord hand, True of False) of indien er geen handen zijn gwn: (None,None)
-            # er is gekozen om per 10 frames te detecteren, maar dat kan nog gewijzigd worden
-            gem = gemiddelde_xco(x_periode(gedetecteerd)) #lijst van gemiddelde xcoord van opgestoken handen
-            xhanden = xco_resultaat(gem,gedetecteerd)
-            if len(xhanden) != 0 and len(xgezicht) != 0:
-                resultaat = koppelen(xhanden,xgezicht)
-                gedetecteerd = []
-                return resultaat, gedetecteerd
-        return None, gedetecteerd
-        #tot hier (dat was het)
+            return resultaat, gedetecteerd
+
+    return None, gedetecteerd
+
+    #tot hier (dat was het)
