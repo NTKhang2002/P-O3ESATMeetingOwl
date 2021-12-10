@@ -1,7 +1,7 @@
 import time
 import serial
 import cv2
-from cvzone.HandTrackingModule import HandDetector
+from hand_positie import HandDetector
 import dlib
 import argparse
 # import pyvirtualcam
@@ -141,7 +141,7 @@ def determine_talking(person,mouth_open):
     if mouth_open:  # mouth is currently open
 
         if person.get_mouth_open() == False: # mouth was previously closed
-            print(person.get_mouth_open())
+            # print(person.get_mouth_open())
             person.set_mouth_open(mouth_open)
             if person.get_mouth_open_time_index() == 2:
                 person.reset_mouth_open_time_index()
@@ -262,9 +262,9 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
     # Startup Arduino
     x_oud = 5000
 
-    nodeMcu = serial.Serial("COM10", 9600)  # Sartup
+    nodeMcu = serial.Serial("COM5", 9600)  # Sartup
     straal_cm = 150
-
+    gedetecteerd = []
 
 
     helft_pixels = width / 2
@@ -300,7 +300,8 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
             fy = person[1]
             mouth_open = person[2]
             update_face(fx, fy, mouth_open, persons)
-        hand_face = koppelen.main(img, detector)
+        hand_face,gedetecteerd = koppelen.main(img, detector,gedetecteerd)
+        print('gedetecteerd')
         if hand_face != None:
             for person in hand_face:
                 fx = person[1]
@@ -336,4 +337,3 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
         # cam.sleep_until_next_frame()
     cap.release()
     cv2.destroyAllWindows()
-pipeline(camera=0)

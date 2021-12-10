@@ -1,6 +1,4 @@
 import cv2
-import time
-
 from hand_positie import HandDetector
 
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -158,7 +156,7 @@ def main(detectionCon = 0.8, maxHands = 4):
         #vanaf hier:
         gedetecteerd.append(xco_status)
         if len(gedetecteerd) == 10:
-            # gedetecteerd is een lijst van frames, elke frame is ook een lijst
+            # gqedetecteerd is een lijst van frames, elke frame is ook een lijst
             # in de lijst van de frame zitten tuples (de tuples stellen handen voor die
             # in dat frame voorkomen): (xcoord hand, True of False) of indien er geen handen zijn gwn: (None,None)
             # er is gekozen om per 10 frames te detecteren, maar dat kan nog gewijzigd worden
