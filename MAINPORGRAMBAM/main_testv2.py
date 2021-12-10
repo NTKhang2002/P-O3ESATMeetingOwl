@@ -336,3 +336,4 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
         # cam.sleep_until_next_frame()
     cap.release()
     cv2.destroyAllWindows()
+pipeline(camera=0)
