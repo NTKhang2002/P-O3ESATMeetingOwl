@@ -1,4 +1,5 @@
 import cv2
+import pyvirtualcam
 
 def zoomboundaries(img , X, Y, W, H, Scalar):
     Ry = img.shape[0]
@@ -75,49 +76,54 @@ def coordinaatzoomfunctie(camera=0):
     Xf, Yf, Wf, Hf = MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY
     xmin, xmax, ymin, ymax = 0, WIDTH, 0, HEIGHT
     i = 0
-    while True:
-        status, imgzoom = capzoom.read()
-        gray = cv2.cvtColor(imgzoom, cv2.COLOR_BGR2GRAY)
-        # Detect the faces
-        faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
-        for (x, y, w, h) in faces:
-            cv2.rectangle(imgzoom, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        #bounding box that represents the part of the image it tracks faces in.
-        cv2.rectangle(imgzoom, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
-        face = mostcentralface(WIDTH,faces,Central_bounding)
+    with pyvirtualcam.Camera(width=1280, height=720, fps=30) as cam:
+        while True:
+            status, imgzoom = capzoom.read()
+            gray = cv2.cvtColor(imgzoom, cv2.COLOR_BGR2GRAY)
+            # Detect the faces
+            faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
+            for (x, y, w, h) in faces:
+                cv2.rectangle(imgzoom, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            #bounding box that represents the part of the image it tracks faces in.
+            cv2.rectangle(imgzoom, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
+            face = mostcentralface(WIDTH,faces,Central_bounding)
 
 
-        if face is not False:
-            if len(faces) != 0  and len(faces) >= face + 1:
-                Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
+            if face is not False:
+                if len(faces) != 0  and len(faces) >= face + 1:
+                    Xf, Yf, Wf, Hf = coordinaatgezicht(faces, face)
 
-        interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
+            interpolatielijst[i % tijd] = [Xf, Yf, Wf, Hf]
 
-        if face is not False:
-            Xf = gemiddeldelijst(interpolatielijst,0)
-            Yf = gemiddeldelijst(interpolatielijst,1)
-            Wf = gemiddeldelijst(interpolatielijst,2)
-            Hf = gemiddeldelijst(interpolatielijst,3)
+            if face is not False:
+                Xf = gemiddeldelijst(interpolatielijst,0)
+                Yf = gemiddeldelijst(interpolatielijst,1)
+                Wf = gemiddeldelijst(interpolatielijst,2)
+                Hf = gemiddeldelijst(interpolatielijst,3)
 
-            if len(faces) != 0  and len(faces) >= face + 1:
-                (xmin, xmax, ymin, ymax) = zoomboundaries(imgzoom, Xf, Yf, Wf, Hf,schaal)
+                if len(faces) != 0  and len(faces) >= face + 1:
+                    (xmin, xmax, ymin, ymax) = zoomboundaries(imgzoom, Xf, Yf, Wf, Hf,schaal)
 
-        imgcropped = crop(imgzoom, xmin, xmax, ymin, ymax)
-        imgresized = resizer(imgcropped, WIDTH, HEIGHT)
+            imgcropped = crop(imgzoom, xmin, xmax, ymin, ymax)
+            imgresized = resizer(imgcropped, WIDTH, HEIGHT)
 
-        cv2.imshow("zoomed", imgresized)
-        cv2.imshow("origineel", imgzoom)
-        toets = cv2.waitKey(10)
-        if toets == 32:
-            xmin = 0
-            xmax = WIDTH
-            ymin = 0
-            ymax = HEIGHT
+            cv2.imshow("zoomed", imgresized)
+            cv2.imshow("origineel", imgzoom)
+            img = cv2.cvtColor(imgresized, cv2.COLOR_BGR2RGB)
+            img = cv2.flip(img, 1)
+            cam.send(img)
+            cam.sleep_until_next_frame()
+            toets = cv2.waitKey(10)
+            if toets == 32:
+                xmin = 0
+                xmax = WIDTH
+                ymin = 0
+                ymax = HEIGHT
 
-        if toets == 27:
-            break
-        i += 1
+            if toets == 27:
+                break
+            i += 1
 
-    capzoom.release()
+        capzoom.release()
 
 
