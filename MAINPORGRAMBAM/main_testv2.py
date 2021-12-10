@@ -264,7 +264,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
 
     nodeMcu = serial.Serial("COM10", 9600)  # Sartup
     straal_cm = 150
-
+    gedetecteerd = []
 
 
     helft_pixels = width / 2
@@ -300,7 +300,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
             fy = person[1]
             mouth_open = person[2]
             update_face(fx, fy, mouth_open, persons)
-        hand_face = koppelen.main(img, detector)
+        hand_face,gedetecteerd = koppelen.main(img, detector,gedetecteerd)
         if hand_face != None:
             for person in hand_face:
                 fx = person[1]

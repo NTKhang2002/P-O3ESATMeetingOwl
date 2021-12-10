@@ -121,11 +121,7 @@ buiten de functies zijn er ook delen die in de main moeten staan
 ik heb ze tussen twee comments gezet
 """
 
-def main(img,detector,detectionCon = 0.8, maxHands = 4):
-
-    #dit stuk hieronder kopieren:
-    gedetecteerd = []
-    #tot hier (er is nog vanonder)
+def main(img,detector,gedetecteerd,detectionCon = 0.8, maxHands = 4):
 
     while True:
         hands, img = detector.findHands(img)
@@ -157,6 +153,7 @@ def main(img,detector,detectionCon = 0.8, maxHands = 4):
             xhanden = xco_resultaat(gem,gedetecteerd)
             if len(xhanden) != 0 and len(xgezicht) != 0:
                 resultaat = koppelen(xhanden,xgezicht)
-                return resultaat
-            gedetecteerd = []
+                gedetecteerd = []
+                return resultaat, gedetecteerd
+        return None, gedetecteerd
         #tot hier (dat was het)
