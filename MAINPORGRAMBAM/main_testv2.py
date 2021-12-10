@@ -7,7 +7,7 @@ import argparse
 # import pyvirtualcam
 import lip_detectorv2 as lip_detector
 import servo_controller
-import koppelen
+import koppelen_oud
 
 proto = False #Testfase
 
@@ -36,13 +36,13 @@ class people:
         self.__time = time.time()
         self.__tracked = False  # person is tracked by camera
         if self.__id == 1:
-            self.__name = "Ben"
+            self.__name = "Ben" # Dover
         elif self.__id == 2:
-            self.__name = "Barry"
+            self.__name = "Barry" # McKockiner
         elif self.__id == 3:
-            self.__name = "Hugh"
+            self.__name = "Hugh" # G. Rection
         elif self.__id == 4:
-            self.__name = "Rae"
+            self.__name = "Deborah"
     def set_hx(self,hx):
         self.__hx = hx
     def set_facedata(self,fx,fy):
@@ -192,6 +192,7 @@ def choose_person(persons,person_tracked,queue,queuetime1,queuetime2):
                     person.set_tracked(False)
     if not person_tracked:
         for person in persons:
+            print(person.get_hx())
             if person.get_hx() != None and person.get_talking():    # if person is talking and has raised his hand
                 if len(queue) ==  0:
                     queue.append(person)
@@ -262,7 +263,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
     # Startup Arduino
     x_oud = 5000
 
-    nodeMcu = serial.Serial("COM5", 9600)  # Sartup
+    nodeMcu = serial.Serial("COM3", 9600)  # Sartup
     straal_cm = 150
     gedetecteerd = []
 
@@ -300,8 +301,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
             fy = person[1]
             mouth_open = person[2]
             update_face(fx, fy, mouth_open, persons)
-        hand_face,gedetecteerd = koppelen.main(img, detector,gedetecteerd)
-        print('gedetecteerd')
+        hand_face = koppelen_oud.main(img, detector)
         if hand_face != None:
             for person in hand_face:
                 fx = person[1]
@@ -337,3 +337,4 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
         # cam.sleep_until_next_frame()
     cap.release()
     cv2.destroyAllWindows()
+pipeline(camera=0)
