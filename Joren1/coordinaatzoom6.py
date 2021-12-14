@@ -54,11 +54,11 @@ def coordinaatzoomfunctie():
     MIDDLEPOINTX = int(WIDTH / 2)
     MIDDLEPOINTY = int(HEIGHT / 2)
     tijd = 15
-    schaal = 1.0
+    schaal = 1.4
     interpolatielijst = [[MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY]] * tijd
 
     # 1/2 for full screen[|---------------------|] , 1/4 to use only the middle part [-----|----------|-----]
-    Central_bounding = int(1 / 2 * WIDTH)
+    Central_bounding = int(1 / 6 * WIDTH)
 
     # creating a variable with the classifiers
     CLASSIFIERS = "haarcascade_frontalface_default.xml"
@@ -66,7 +66,7 @@ def coordinaatzoomfunctie():
     # Create cascade
     FaceCascade = cv2.CascadeClassifier(CLASSIFIERS)
     # Capture from camera, 0 because webcam
-    capzoom = cv2.VideoCapture(1)
+    capzoom = cv2.VideoCapture(1,cv2.CAP_DSHOW)
     capzoom.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     capzoom.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     capzoom.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
@@ -119,3 +119,5 @@ def coordinaatzoomfunctie():
         i += 1
 
     capzoom.release()
+
+coordinaatzoomfunctie()
