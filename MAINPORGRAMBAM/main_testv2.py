@@ -3,7 +3,6 @@ import serial
 import cv2
 from hand_positie import HandDetector
 import dlib
-import argparse
 # import pyvirtualcam
 import lip_detectorv2 as lip_detector
 import servo_controller

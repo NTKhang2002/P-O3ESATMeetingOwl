@@ -1,6 +1,5 @@
 import cv2
 import time
-from cvzone.HandTrackingModule import HandDetector
 
 def hand_status(detector, hands):
     h = []
