@@ -50,11 +50,11 @@ def mostcentralface(width,faces,Central_bounding):
     return False
 
 def coordinaatzoomfunctie(camera=0):
-    HEIGHT = 720
+    HEIGHT = 480
     WIDTH = int(16 / 9 * HEIGHT)
     MIDDLEPOINTX = int(WIDTH / 2)
     MIDDLEPOINTY = int(HEIGHT / 2)
-    tijd = 15
+    tijd = 17
     schaal = 1.4
     interpolatielijst = [[MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY]] * tijd
 
@@ -76,16 +76,16 @@ def coordinaatzoomfunctie(camera=0):
     Xf, Yf, Wf, Hf = MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY
     xmin, xmax, ymin, ymax = 0, WIDTH, 0, HEIGHT
     i = 0
-    with pyvirtualcam.Camera(width=1280, height=720, fps=30) as cam:
+    with pyvirtualcam.Camera(width=WIDTH, height=HEIGHT, fps=30) as cam:
         while True:
             status, imgzoom = capzoom.read()
             gray = cv2.cvtColor(imgzoom, cv2.COLOR_BGR2GRAY)
             # Detect the faces
             faces = FaceCascade.detectMultiScale(gray, scaleFactor=1.22, minNeighbors=8, minSize=(60, 60))
-            for (x, y, w, h) in faces:
-                cv2.rectangle(imgzoom, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            """for (x, y, w, h) in faces:
+                cv2.rectangle(imgzoom, (x, y), (x + w, y + h), (255, 0, 0), 2)"""
             #bounding box that represents the part of the image it tracks faces in.
-            cv2.rectangle(imgzoom, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
+            #cv2.rectangle(imgzoom, (int(WIDTH/2) - Central_bounding,0),(int(WIDTH/2)+Central_bounding,HEIGHT),(255,255,255),2)
             face = mostcentralface(WIDTH,faces,Central_bounding)
 
 
@@ -125,5 +125,6 @@ def coordinaatzoomfunctie(camera=0):
             i += 1
 
         capzoom.release()
+
 
 
