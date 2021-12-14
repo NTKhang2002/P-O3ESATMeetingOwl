@@ -108,10 +108,10 @@ def coordinaatzoomfunctie(camera=0):
             imgresized = resizer(imgcropped, WIDTH, HEIGHT)
 
             cv2.imshow("zoomed", imgresized)
-            cv2.imshow("origineel", imgzoom)
-            img = cv2.cvtColor(imgresized, cv2.COLOR_BGR2RGB)
-            img = cv2.flip(img, 1)
-            cam.send(img)
+            # cv2.imshow("origineel", imgzoom)
+            """imgresized = cv2.cvtColor(imgresized, cv2.COLOR_BGR2RGB)
+            imgresized = cv2.flip(imgresized, 1)"""
+            cam.send(imgresized)
             cam.sleep_until_next_frame()
             toets = cv2.waitKey(10)
             if toets == 32:

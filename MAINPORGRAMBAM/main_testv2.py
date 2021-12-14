@@ -262,7 +262,7 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
     # Startup Arduino
     x_oud = 5000
 
-    nodeMcu = serial.Serial("COM10", 9600)  # Sartup
+    nodeMcu = serial.Serial("COM5", 9600)  # Sartup
     straal_cm = 150
     helft_pixels = width / 2
 
@@ -333,4 +333,3 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
         # cam.sleep_until_next_frame()
     cap.release()
     cv2.destroyAllWindows()
-pipeline(camera=1)
