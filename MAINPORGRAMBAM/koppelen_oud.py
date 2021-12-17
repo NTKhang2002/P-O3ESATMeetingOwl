@@ -6,7 +6,6 @@ opgestoken hand(en) aan een gezicht koppelen
 
 import cv2
 from hand_status import hand_status
-from cvzone.HandTrackingModule import HandDetector
 
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
