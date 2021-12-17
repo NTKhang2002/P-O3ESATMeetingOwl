@@ -153,7 +153,7 @@ def determine_talking(person,mouth_open):
         if person.get_mouth_open():     # mouth was previously open
             person.set_mouth_open(mouth_open)
             person.set_mouth_closed_time1()
-    if person.get_mouth_closed_time2() -  person.get_mouth_closed_time1() > 2:  # mouth closed for longer than 2 seconds
+    if person.get_mouth_closed_time2() -  person.get_mouth_closed_time1() > 1.30:  # mouth closed for longer than 2 seconds
         person.set_talking(False)
     elif person.get_mouth_open_time_diff() < 6: # mouth opened 3 different times in 4 seconds
         person.set_talking(True)

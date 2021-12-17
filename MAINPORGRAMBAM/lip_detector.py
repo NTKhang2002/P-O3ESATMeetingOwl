@@ -146,7 +146,7 @@ def lipdetector(frame, detector,predictor,MOUTH_AR_THRESH = 0.70, mStart = 49, m
             # visualize the mouth
             mouthHull = cv2.convexHull(mouth)
             (x, y, w, h) = face_utils.rect_to_bb(rect)
-            cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(frame, "MAR: {:.2f}".format(mar), (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.76, (0, 0, 255), 2)
             # Draw text if mouth is open + visualize the mouth in blue
             if mar > MOUTH_AR_THRESH:
 
