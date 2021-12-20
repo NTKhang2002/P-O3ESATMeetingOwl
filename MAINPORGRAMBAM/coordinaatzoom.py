@@ -57,7 +57,7 @@ def coordinaatzoomfunctie(camera=0):
     tijd = 17
     schaal = 1.4
     interpolatielijst = [[MIDDLEPOINTX, MIDDLEPOINTY, MIDDLEPOINTX, MIDDLEPOINTY]] * tijd
-
+    Camlock = False
     # 1/2 for full screen[|---------------------|] , 1/4 to use only the middle part [-----|----------|-----]
     Central_bounding = int(1 / 6 * WIDTH)
 
@@ -104,6 +104,12 @@ def coordinaatzoomfunctie(camera=0):
                 if len(faces) != 0  and len(faces) >= face + 1:
                     (xmin, xmax, ymin, ymax) = zoomboundaries(imgzoom, Xf, Yf, Wf, Hf,schaal)
 
+            if Camlock == True:
+                xmin = 0
+                xmax = WIDTH
+                ymin = 0
+                ymax = HEIGHT
+
             imgcropped = crop(imgzoom, xmin, xmax, ymin, ymax)
             imgresized = resizer(imgcropped, WIDTH, HEIGHT)
 
@@ -115,10 +121,10 @@ def coordinaatzoomfunctie(camera=0):
             cam.sleep_until_next_frame()
             toets = cv2.waitKey(10)
             if toets == 32:
-                xmin = 0
-                xmax = WIDTH
-                ymin = 0
-                ymax = HEIGHT
+                if Camlock == False:
+                    Camlock = True
+                else:
+                    Camlock = False
 
             if toets == 27:
                 break
