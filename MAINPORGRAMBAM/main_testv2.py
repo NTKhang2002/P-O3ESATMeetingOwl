@@ -326,6 +326,8 @@ def pipeline(camera = 0,detectionCon = 0.8, maxHands = 4,HEIGHT = 602,max_person
         cv2.imshow("image", img)
         if cv2.waitKey(1) == ord('q'):
             break
+        if cv2.waitKey(1) == ord('r'):
+            servo_controller.move(helft_pixels,5000,nodeMcu,width,straal_cm,helft_pixels)
         # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # img = cv2.flip(img, 1)
         # cam.send(img)
