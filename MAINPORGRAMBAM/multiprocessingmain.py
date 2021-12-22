@@ -1,7 +1,7 @@
 import multiprocessing
 from main_testv2 import pipeline
 from coordinaatzoom import coordinaatzoomfunctie
-zoomcamera = 2
+zoomcamera = 0
 widecamera = 1
 
 

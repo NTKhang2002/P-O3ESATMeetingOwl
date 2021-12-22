@@ -1,27 +1,21 @@
 import cv2
 import time
 from cvzone.HandTrackingModule import HandDetector
-
 def hand_status(detector, hands):
-    hand_list = []
+    h = []
     if hands:
         for id in range(len(hands)):
             hand = hands[id]
-            cx, cy = hand["center"]  # centerpoint: cx cy
+            cx, cy = hand["center"]
             fingers = detector.fingersUp(hand)
-            if fingers == [0,0,0,0,0]:
-                """ HAND STATUS: -1 Closed
-                                  0 Open
-                                  1 Talk gesture """
-                hand_status = -1
-            elif fingers == [1,1,1,1,1] or fingers == [0,1,1,1,1]:
-                hand_status = 1
-            else:
-                hand_status = 0
+            positie = detector.voorkant_hand(hand)
+            if fingers == [1,1,1,1,1] or fingers == [0,1,1,1,1]:
+                if positie == True:
+                    h.append(cx)
+    else:
+        return h
+    return h
 
-            result = [hand_status, cx, cy]
-            hand_list.append(result)
-    return hand_list
 def main(detectionCon = 0.8, maxHands = 4):
     # Camera preparation
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
