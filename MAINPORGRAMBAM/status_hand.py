@@ -1,6 +1,6 @@
 import cv2
 import time
-from cvzone.HandTrackingModule import HandDetector
+from hand_positie import HandDetector
 def hand_status(detector, hands):
     h = []
     if hands:
